@@ -30,34 +30,34 @@ namespace CP_ParallelPipesForm
 
 
 	[System.Serializable]
-	//ТРУБА
+	//РўР РЈР‘Рђ
 	public class Pipe
 	{
 		public string name;
 
 		public double
-		Ht = 1, // глубина от уровня земли до верхней т.Т, м
-		ro_t = 2.45e-7, // Уд сопр стали, Ом*м
-		Dt2 = 1.22, // Внешний диаметр Т, м: 0.3..1.5
-		Det = 0.022, // Толщина стенки Т, м: 0.01..0.025
-		Lta = 200; // расстояние до анода
+		Ht = 1, // РіР»СѓР±РёРЅР° РѕС‚ СѓСЂРѕРІРЅСЏ Р·РµРјР»Рё РґРѕ РІРµСЂС…РЅРµР№ С‚.Рў, Рј
+		ro_t = 2.45e-7, // РЈРґ СЃРѕРїСЂ СЃС‚Р°Р»Рё, РћРј*Рј
+		Dt2 = 1.22, // Р’РЅРµС€РЅРёР№ РґРёР°РјРµС‚СЂ Рў, Рј: 0.3..1.5
+		Det = 0.022, // РўРѕР»С‰РёРЅР° СЃС‚РµРЅРєРё Рў, Рј: 0.01..0.025
+		Lta = 200; // СЂР°СЃСЃС‚РѕСЏРЅРёРµ РґРѕ Р°РЅРѕРґР°
 		
-		public double Rt2 { get; private set; } // Внешн радиус Т
-		public double Rt0 { get; private set; } // Внутр радиус Т
-		public double SechT { get; private set; } // Площадь сеч металла Т
-		public double RproT { get; private set; } // продольное сопротивление трубы, Ом/м
-		public double RproT1 { get; private set; } // продольное сопротивление трубы на единицу длины, Ом*м
-		public double Sigma_t { get; private set; }  // Удельная электропроводность металла трубы
-		public double Lfi { get; private set; }  // длина одной части ФИ трубы
-		public double St { get; private set; } // площади боковых поверхностей
-		public double Zt { get; private set; }  //входное сопротивление трубопровода, Ом
-		public double Its; // Ток, втекающий в точку дренажа 
-		public Vector3[] FIs; // координаты ФИ
+		public double Rt2 { get; private set; } // Р’РЅРµС€РЅ СЂР°РґРёСѓСЃ Рў
+		public double Rt0 { get; private set; } // Р’РЅСѓС‚СЂ СЂР°РґРёСѓСЃ Рў
+		public double SechT { get; private set; } // РџР»РѕС‰Р°РґСЊ СЃРµС‡ РјРµС‚Р°Р»Р»Р° Рў
+		public double RproT { get; private set; } // РїСЂРѕРґРѕР»СЊРЅРѕРµ СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ С‚СЂСѓР±С‹, РћРј/Рј
+		public double RproT1 { get; private set; } // РїСЂРѕРґРѕР»СЊРЅРѕРµ СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ С‚СЂСѓР±С‹ РЅР° РµРґРёРЅРёС†Сѓ РґР»РёРЅС‹, РћРј*Рј
+		public double Sigma_t { get; private set; }  // РЈРґРµР»СЊРЅР°СЏ СЌР»РµРєС‚СЂРѕРїСЂРѕРІРѕРґРЅРѕСЃС‚СЊ РјРµС‚Р°Р»Р»Р° С‚СЂСѓР±С‹
+		public double Lfi { get; private set; }  // РґР»РёРЅР° РѕРґРЅРѕР№ С‡Р°СЃС‚Рё Р¤Р С‚СЂСѓР±С‹
+		public double St { get; private set; } // РїР»РѕС‰Р°РґРё Р±РѕРєРѕРІС‹С… РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№
+		public double Zt { get; private set; }  //РІС…РѕРґРЅРѕРµ СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ С‚СЂСѓР±РѕРїСЂРѕРІРѕРґР°, РћРј
+		public double Its; // РўРѕРє, РІС‚РµРєР°СЋС‰РёР№ РІ С‚РѕС‡РєСѓ РґСЂРµРЅР°Р¶Р° 
+		public Vector3[] FIs; // РєРѕРѕСЂРґРёРЅР°С‚С‹ Р¤Р
 
-		// ======================== ИЗОЛЯЦИЯ ТРУБЫ ========================
-		public double Ct = 300000; // уд. сопротивление изоляции трубы, Ом*м2
-		public double Rct { get; private set; } // сопротивление изоляции трубы, Ом*м
-		public double Rct1 { get; private set; } // сопротивление изоляции на единицу длины, Ом*м
+		// ======================== РР—РћР›РЇР¦РРЇ РўР РЈР‘Р« ========================
+		public double Ct = 300000; // СѓРґ. СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ РёР·РѕР»СЏС†РёРё С‚СЂСѓР±С‹, РћРј*Рј2
+		public double Rct { get; private set; } // СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ РёР·РѕР»СЏС†РёРё С‚СЂСѓР±С‹, РћРј*Рј
+		public double Rct1 { get; private set; } // СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ РёР·РѕР»СЏС†РёРё РЅР° РµРґРёРЅРёС†Сѓ РґР»РёРЅС‹, РћРј*Рј
 		
 		public Pipe()
 		{
@@ -87,23 +87,23 @@ namespace CP_ParallelPipesForm
 			}
 		}
 
-		public double getDistanceBetweenFIs(int fiIndex1, int fiIndex2) // расстояние м/у фиктивными источниками
+		public double getDistanceBetweenFIs(int fiIndex1, int fiIndex2) // СЂР°СЃСЃС‚РѕСЏРЅРёРµ Рј/Сѓ С„РёРєС‚РёРІРЅС‹РјРё РёСЃС‚РѕС‡РЅРёРєР°РјРё
 		{
 			return Vector3.Distance(FIs[fiIndex1], FIs[fiIndex2]);
 		}
 
-		public double getDistanceBetweenPoint(int fiIndex, Vector3 point) // расстояние м/у фиктивным источником и точкой
+		public double getDistanceBetweenPoint(int fiIndex, Vector3 point) // СЂР°СЃСЃС‚РѕСЏРЅРёРµ Рј/Сѓ С„РёРєС‚РёРІРЅС‹Рј РёСЃС‚РѕС‡РЅРёРєРѕРј Рё С‚РѕС‡РєРѕР№
 		{
 			return Vector3.Distance(FIs[fiIndex], point);
 		}
 	}
 	[System.Serializable]
-	//Анод
+	//РђРЅРѕРґ
 	public class Anod
 	{
 		public double
-		I0 = 0.3, // сила тока анода
-		Za = 1; // Глубина точечного анода
+		I0 = 0.3, // СЃРёР»Р° С‚РѕРєР° Р°РЅРѕРґР°
+		Za = 1; // Р“Р»СѓР±РёРЅР° С‚РѕС‡РµС‡РЅРѕРіРѕ Р°РЅРѕРґР°
 		public Vector3 pos { get; private set; }
 
 		public Anod()
@@ -121,23 +121,23 @@ namespace CP_ParallelPipesForm
 		public DateTime dateTime;
 
 		public int
-		L = 24000, // длина труб
-		Nfi = 100; // кол-во ФИ трубы
+		L = 24000, // РґР»РёРЅР° С‚СЂСѓР±
+		Nfi = 100; // РєРѕР»-РІРѕ Р¤Р С‚СЂСѓР±С‹
 
-		public List<Pipe> Pipes = new List<Pipe>();// трубы
-		public Anod anod = new Anod(); // анод
-		public double Z0 { get; private set; } // общее входное сопротивление, Ом
+		public List<Pipe> Pipes = new List<Pipe>();// С‚СЂСѓР±С‹
+		public Anod anod = new Anod(); // Р°РЅРѕРґ
+		public double Z0 { get; private set; } // РѕР±С‰РµРµ РІС…РѕРґРЅРѕРµ СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ, РћРј
 
-		// ======================== ГРУНТ =================================
-		public double ro_g = 500; // Уд сопр грунта, Ом*м: 5..10000
-		public double Sigma_g { get; private set; } // Удельная электропроводность грунта
+		// ======================== Р“Р РЈРќРў =================================
+		public double ro_g = 500; // РЈРґ СЃРѕРїСЂ РіСЂСѓРЅС‚Р°, РћРј*Рј: 5..10000
+		public double Sigma_g { get; private set; } // РЈРґРµР»СЊРЅР°СЏ СЌР»РµРєС‚СЂРѕРїСЂРѕРІРѕРґРЅРѕСЃС‚СЊ РіСЂСѓРЅС‚Р°
 
-		// ======================== ПРОЧЕЕ ================================
+		// ======================== РџР РћР§Р•Р• ================================
 
-		int slauBlockTSize;// размерность СЛАУ
-		int slauSize;// размер блока уравнений для 1 трубы;
+		int slauBlockTSize;// СЂР°Р·РјРµСЂРЅРѕСЃС‚СЊ РЎР›РђРЈ
+		int slauSize;// СЂР°Р·РјРµСЂ Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ РґР»СЏ 1 С‚СЂСѓР±С‹;
 
-		LinearSystem resultSlau; // полученная матрица
+		LinearSystem resultSlau; // РїРѕР»СѓС‡РµРЅРЅР°СЏ РјР°С‚СЂРёС†Р°
 		void Init()
 		{
 			dateTime = DateTime.Now;
@@ -145,11 +145,11 @@ namespace CP_ParallelPipesForm
 			slauSize = 5 * Nfi * Pipes.Count - Pipes.Count;
 			slauBlockTSize = 5 * Nfi - 1;
 
-			anod.Init(L); // инициализация анода
+			anod.Init(L); // РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р°РЅРѕРґР°
 
 			for (int i = 0; i < Pipes.Count; i++)
 			{
-				Pipes[i].Init(L, Nfi); // инциализация и рассчет параметров трубы
+				Pipes[i].Init(L, Nfi); // РёРЅС†РёР°Р»РёР·Р°С†РёСЏ Рё СЂР°СЃСЃС‡РµС‚ РїР°СЂР°РјРµС‚СЂРѕРІ С‚СЂСѓР±С‹
 			}
 
 			Z0 = 0;
@@ -177,34 +177,34 @@ namespace CP_ParallelPipesForm
 
 			Init();
 
-			double[,] A = new double[slauSize, slauSize]; // матрица с коэффицентами системы уравенний
-			double[] B = new double[slauSize]; // вектор и с изветными параметрами
+			double[,] A = new double[slauSize, slauSize]; // РјР°С‚СЂРёС†Р° СЃ РєРѕСЌС„С„РёС†РµРЅС‚Р°РјРё СЃРёСЃС‚РµРјС‹ СѓСЂР°РІРµРЅРЅРёР№
+			double[] B = new double[slauSize]; // РІРµРєС‚РѕСЂ Рё СЃ РёР·РІРµС‚РЅС‹РјРё РїР°СЂР°РјРµС‚СЂР°РјРё
 
-			int isk = (int)Math.Floor(Nfi / 2d) + 1; // номер ФИ в точке подклюения к катодной станции
+			int isk = (int)Math.Floor(Nfi / 2d) + 1; // РЅРѕРјРµСЂ Р¤Р РІ С‚РѕС‡РєРµ РїРѕРґРєР»СЋРµРЅРёСЏ Рє РєР°С‚РѕРґРЅРѕР№ СЃС‚Р°РЅС†РёРё
 
-			for (int k = 0; k < Pipes.Count; k++) // k - номер трубы
+			for (int k = 0; k < Pipes.Count; k++) // k - РЅРѕРјРµСЂ С‚СЂСѓР±С‹
 			{
-				int slauBlock = slauBlockTSize * k - 1; // начальная координата блока уравений по вертикали для трубы с номером k
+				int slauBlock = slauBlockTSize * k - 1; // РЅР°С‡Р°Р»СЊРЅР°СЏ РєРѕРѕСЂРґРёРЅР°С‚Р° Р±Р»РѕРєР° СѓСЂР°РІРµРЅРёР№ РїРѕ РІРµСЂС‚РёРєР°Р»Рё РґР»СЏ С‚СЂСѓР±С‹ СЃ РЅРѕРјРµСЂРѕРј k
 
-				int ItkgY = slauBlock; // нач. коорд. блока уравнений Itkg
-				int ItkxY = slauBlock + Nfi; // нач. коорд. блока уравнений Itkx
-				int UtkgY = slauBlock + 2 * Nfi - 1; // нач. коорд. блока уравнений Utkg
-				int UtkmY = slauBlock + 3 * Nfi - 1; // нач. коорд. блока уравнений Utkm
-				int Utpr = slauBlock + 4 * Nfi - 1; // нач. коорд. блока уравнений Utpr
+				int ItkgY = slauBlock; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ Itkg
+				int ItkxY = slauBlock + Nfi; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ Itkx
+				int UtkgY = slauBlock + 2 * Nfi - 1; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ Utkg
+				int UtkmY = slauBlock + 3 * Nfi - 1; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ Utkm
+				int Utpr = slauBlock + 4 * Nfi - 1; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ Utpr
 
-				int slau1X = slauBlock; // нач. коорд. блока уравнений по X
-				int slau2X = slauBlock + Nfi; // нач. коорд. блока уравнений по X
-				int slau3X = slauBlock + 2 * Nfi; // нач. коорд. блока уравнений по X
-				int slau4X = slauBlock + 3 * Nfi - 1; // нач. коорд. блока уравнений по X
-				int slau5X = slauBlock + 4 * Nfi - 1; // нач. коорд. блока уравнений по X
+				int slau1X = slauBlock; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ РїРѕ X
+				int slau2X = slauBlock + Nfi; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ РїРѕ X
+				int slau3X = slauBlock + 2 * Nfi; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ РїРѕ X
+				int slau4X = slauBlock + 3 * Nfi - 1; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ РїРѕ X
+				int slau5X = slauBlock + 4 * Nfi - 1; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ РїРѕ X
 
-				//++++++++++++++++++ 1 блок уравнений ++++++++++++++++++++++
-				//Законы Киргофа для ФИ по трубе
-				//---------------при i=1-----------------------------------
+				//++++++++++++++++++ 1 Р±Р»РѕРє СѓСЂР°РІРЅРµРЅРёР№ ++++++++++++++++++++++
+				//Р—Р°РєРѕРЅС‹ РљРёСЂРіРѕС„Р° РґР»СЏ Р¤Р РїРѕ С‚СЂСѓР±Рµ
+				//---------------РїСЂРё i=1-----------------------------------
 				A[slau1X + 1, ItkgY + 1] = 1;                   //Itkg1
 				A[slau1X + 1, ItkxY + 1] = -1;                  //Itkx1
 
-				//---------------при i=2,…,isk-1---------------------------
+				//---------------РїСЂРё i=2,вЂ¦,isk-1---------------------------
 				for (int i = 2; i <= isk - 1; i++)
 				{
 					A[slau1X + i, ItkgY + i] = 1;               //Itkg,i
@@ -212,7 +212,7 @@ namespace CP_ParallelPipesForm
 					A[slau1X + i, ItkxY + i] = -1;              //Itkx,i
 				}
 
-				//---------------при i=isk--------------------------------
+				//---------------РїСЂРё i=isk--------------------------------
 
 
 				for (int j = 0; j < Pipes.Count; j++)
@@ -228,7 +228,7 @@ namespace CP_ParallelPipesForm
 
 				B[slau1X + isk] = Pipes[k].Its;
 
-				//---------------при i=isk+1,…,N-1------------------------
+				//---------------РїСЂРё i=isk+1,вЂ¦,N-1------------------------
 				for (int i = isk + 1; i <= Nfi - 1; i++)
 				{
 					A[slau1X + i, ItkgY + i] = 1;               //Itkg,i
@@ -236,13 +236,13 @@ namespace CP_ParallelPipesForm
 					A[slau1X + i, ItkxY + i] = 1;               //Itkx,i
 				}
 
-				//---------------при i=N-----------------------------------
+				//---------------РїСЂРё i=N-----------------------------------
 				A[slau1X + Nfi, ItkgY + Nfi] = 1;     //Itkg,N
 				A[slau1X + Nfi, ItkxY + Nfi - 1] = -1; //Itkx,N-1
 
 
-				//++++++++++++++++++ 2 блок уравнений ++++++++++++++++++++++
-				//Граничные условия 3 рода
+				//++++++++++++++++++ 2 Р±Р»РѕРє СѓСЂР°РІРЅРµРЅРёР№ ++++++++++++++++++++++
+				//Р“СЂР°РЅРёС‡РЅС‹Рµ СѓСЃР»РѕРІРёСЏ 3 СЂРѕРґР°
 
 				for (int i = 1; i <= Nfi; i++)
 				{
@@ -251,8 +251,8 @@ namespace CP_ParallelPipesForm
 					A[slau2X + i, UtkmY + i] = -1;              //Utkm,i
 				}
 
-				//++++++++++++++++++ 3 блок уравнений ++++++++++++++++++++++
-				//Закон Ома между соседними фиктивными источниками
+				//++++++++++++++++++ 3 Р±Р»РѕРє СѓСЂР°РІРЅРµРЅРёР№ ++++++++++++++++++++++
+				//Р—Р°РєРѕРЅ РћРјР° РјРµР¶РґСѓ СЃРѕСЃРµРґРЅРёРјРё С„РёРєС‚РёРІРЅС‹РјРё РёСЃС‚РѕС‡РЅРёРєР°РјРё
 
 				for (int i = 1; i <= Nfi; i++)
 				{
@@ -287,8 +287,8 @@ namespace CP_ParallelPipesForm
 					}
 				}
 				
-				//++++++++++++++++++ 4 блок уравнений ++++++++++++++++++++++
-				//Выражения для принципа электростатической аналогии
+				//++++++++++++++++++ 4 Р±Р»РѕРє СѓСЂР°РІРЅРµРЅРёР№ ++++++++++++++++++++++
+				//Р’С‹СЂР°Р¶РµРЅРёСЏ РґР»СЏ РїСЂРёРЅС†РёРїР° СЌР»РµРєС‚СЂРѕСЃС‚Р°С‚РёС‡РµСЃРєРѕР№ Р°РЅР°Р»РѕРіРёРё
 
 				for (int i = 1; i <= Nfi; i++)
 				{
@@ -308,8 +308,8 @@ namespace CP_ParallelPipesForm
 					B[slau4X + i] = anod.I0 / Pipes[k].getDistanceBetweenPoint(i - 1, anod.pos);
 				}
 
-				//++++++++++++++++++ 5 блок уравнений ++++++++++++++++++++++
-				//Защитный потенциал
+				//++++++++++++++++++ 5 Р±Р»РѕРє СѓСЂР°РІРЅРµРЅРёР№ ++++++++++++++++++++++
+				//Р—Р°С‰РёС‚РЅС‹Р№ РїРѕС‚РµРЅС†РёР°Р»
 				for (int i = 1; i <= Nfi; i++)
 				{
 					A[slau5X + i, Utpr + i] = 1;               //Utpr
@@ -348,11 +348,11 @@ namespace CP_ParallelPipesForm
 		}
 		public double[][] getItg(int k) {
 			
-			//int ItkgY = slauBlock; // нач. коорд. блока уравнений Itkg
-			//int ItkxY = slauBlock + Nfi; // нач. коорд. блока уравнений Itkx
-			//int UtkgY = slauBlock + 2 * Nfi - 1; // нач. коорд. блока уравнений Utkg
-			//int UtkmY = slauBlock + 3 * Nfi - 1; // нач. коорд. блока уравнений Utkm
-			//int Utpr = slauBlock + 4 * Nfi - 1; // нач. коорд. блока уравнений Utpr
+			//int ItkgY = slauBlock; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ Itkg
+			//int ItkxY = slauBlock + Nfi; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ Itkx
+			//int UtkgY = slauBlock + 2 * Nfi - 1; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ Utkg
+			//int UtkmY = slauBlock + 3 * Nfi - 1; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ Utkm
+			//int Utpr = slauBlock + 4 * Nfi - 1; // РЅР°С‡. РєРѕРѕСЂРґ. Р±Р»РѕРєР° СѓСЂР°РІРЅРµРЅРёР№ Utpr
 
 			int startCoord = slauBlockTSize * k+1;
 			int size = Nfi-2;
@@ -478,9 +478,9 @@ namespace CP_ParallelPipesForm
 			if (max_abs < eps)
 			{
 				if (Math.Abs(b_vector[row]) > eps)
-					throw new Exception("Система уравнений несовместна.");
+					throw new Exception("РЎРёСЃС‚РµРјР° СѓСЂР°РІРЅРµРЅРёР№ РЅРµСЃРѕРІРјРµСЃС‚РЅР°.");
 				else
-					throw new Exception("Система уравнений имеет множество решений..");
+					throw new Exception("РЎРёСЃС‚РµРјР° СѓСЂР°РІРЅРµРЅРёР№ РёРјРµРµС‚ РјРЅРѕР¶РµСЃС‚РІРѕ СЂРµС€РµРЅРёР№..");
 			}
 			int temp = index[row];
 			index[row] = index[max_index];

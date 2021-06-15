@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 
@@ -52,7 +53,7 @@ namespace CP_ParallelPipesForm
         {
             InitializeComponent();
             UprButtonGraph.Click += (object sender, EventArgs e) => { graphicBtn_Click("Защитный потенциал,Upr, В", "Upr", cp.name, comboBoxUpr, cp.getUtpr); };
-            UtgButtonGraph.Click += (object sender, EventArgs e) => { graphicBtn_Click("Потенциал в грунте, Utg, В", "Utg", cp.name, comboBoxUtg, cp.getUtg); } ;
+            UtgButtonGraph.Click += (object sender, EventArgs e) => { graphicBtn_Click("Потенциал в грунте, Utg, В", "Utg", cp.name, comboBoxUtg, cp.getUtg); };
             UtmButtonGraph.Click += (object sender, EventArgs e) => { graphicBtn_Click("Потенциал в металле, Utm, В", "Utm", cp.name, comboBoxUtm, cp.getUtm); };
             ItgButtonGraph.Click += (object sender, EventArgs e) => { graphicBtn_Click("Ток, втекающий через боковую поверхность, Itg, А/м2", cp.name, "Itg", comboBoxItg, cp.getItg); };
             ItxButtonGraph.Click += (object sender, EventArgs e) => { graphicBtn_Click("Продольный ток между соседними ФИ, Itx, А/м2", cp.name, "Itx", comboBoxItx, cp.getItx); };
@@ -66,27 +67,17 @@ namespace CP_ParallelPipesForm
 
         void InitComboBoxes()
         {
-            
-            comboBoxUpr.Items.Add("Все");
-            comboBoxUtg.Items.Add("Все");
-            comboBoxUtm.Items.Add("Все");
-            comboBoxItg.Items.Add("Все");
-            comboBoxItx.Items.Add("Все");
-
+            string[] boxesNames = { "comboBoxUpr", "comboBoxUtg", "comboBoxUtm", "comboBoxItg", "comboBoxItx" };
             for (int i = 0; i < cp.Pipes.Count; i++)
             {
-                comboBoxUpr.Items.Add(cp.Pipes[i].name);
-                comboBoxUtg.Items.Add(cp.Pipes[i].name);
-                comboBoxUtm.Items.Add(cp.Pipes[i].name);
-                comboBoxItg.Items.Add(cp.Pipes[i].name);
-                comboBoxItx.Items.Add(cp.Pipes[i].name);
+                for (int j = 0; j < boxesNames.Length; j++)
+                {
+                    ComboBox box = (ComboBox)this.GetType().GetField(boxesNames[j], BindingFlags.Instance | BindingFlags.NonPublic).GetValue(this);
+                    box.Items.Add("Все");
+                    box.Items.Add(cp.Pipes[i].name);
+                    box.SelectedIndex = 0;
+                }
             }
-
-            comboBoxUpr.SelectedIndex = 0;
-            comboBoxUtg.SelectedIndex = 0;
-            comboBoxUtm.SelectedIndex = 0;
-            comboBoxItg.SelectedIndex = 0;
-            comboBoxItx.SelectedIndex = 0;
         }
 
         private void graphicBtn_Click(string graphName, string name, string issledName, ComboBox comboBox, Func<int,double[][]> points)

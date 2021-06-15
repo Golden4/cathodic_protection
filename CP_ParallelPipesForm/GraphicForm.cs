@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Drawing;
