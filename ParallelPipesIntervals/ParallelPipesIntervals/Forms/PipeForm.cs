@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace CP_ParallelPipesForm
+namespace ParallelPipesIntervals
 {
     public partial class PipeForm : Form
     {

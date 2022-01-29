@@ -1,35 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
+using ParallelPipesIntervals.Core;
 
-namespace CP_ParallelPipesForm
+namespace ParallelPipesIntervals
 {
-	[System.Serializable]
-	public class Vector3
-	{
-		public double x;
-		public double y;
-		public double z;
-
-		public Vector3(double x, double y, double z)
-		{
-			this.x = x;
-			this.y = y;
-			this.z = z;
-		}
-
-		public static double Distance(Vector3 vec1, Vector3 vec2)
-		{
-			double x1 = (vec1.x - vec2.x) * (vec1.x - vec2.x);
-			double y1 = (vec1.y - vec2.y) * (vec1.y - vec2.y);
-			double z1 = (vec1.z - vec2.z) * (vec1.z - vec2.z);
-
-			return Math.Sqrt(x1 + y1 + z1);
-		}
-	}
-
-
-	[System.Serializable]
+	[Serializable]
 	//ТРУБА
 	public class Pipe
 	{
@@ -52,7 +27,7 @@ namespace CP_ParallelPipesForm
 		public double St { get; private set; } // площади боковых поверхностей
 		public double Zt { get; private set; }  //входное сопротивление трубопровода, Ом
 		public double Its; // Ток, втекающий в точку дренажа 
-		public Vector3[] FIs; // координаты ФИ
+		public Vector3<double>[] FIs; // координаты ФИ
 
 		// ======================== ИЗОЛЯЦИЯ ТРУБЫ ========================
 		public double Ct = 300000; // уд. сопротивление изоляции трубы, Ом*м2
@@ -79,22 +54,22 @@ namespace CP_ParallelPipesForm
 
 			Zt = Math.Sqrt(Rct1 * RproT1) / 2d;
 
-			FIs = new Vector3[Nfi];
+			FIs = new Vector3<double>[Nfi];
 
 			for (int i = 0; i < Nfi; i++)
 			{
-				FIs[i] = new Vector3((i * Lfi + Lfi / 2), Lta, (Ht + Rt2));
+				FIs[i] = new Vector3<double>((i * Lfi + Lfi / 2), Lta, (Ht + Rt2));
 			}
 		}
 
 		public double getDistanceBetweenFIs(int fiIndex1, int fiIndex2) // расстояние м/у фиктивными источниками
 		{
-			return Vector3.Distance(FIs[fiIndex1], FIs[fiIndex2]);
+			return Vector3<double>.Distance(FIs[fiIndex1], FIs[fiIndex2]);
 		}
 
-		public double getDistanceBetweenPoint(int fiIndex, Vector3 point) // расстояние м/у фиктивным источником и точкой
+		public double getDistanceBetweenPoint(int fiIndex, Vector3<double> point) // расстояние м/у фиктивным источником и точкой
 		{
-			return Vector3.Distance(FIs[fiIndex], point);
+			return Vector3<double>.Distance(FIs[fiIndex], point);
 		}
 	}
 	[System.Serializable]
@@ -104,14 +79,14 @@ namespace CP_ParallelPipesForm
 		public double
 		I0 = 0.3, // сила тока анода
 		Za = 1; // Глубина точечного анода
-		public Vector3 pos { get; private set; }
+		public Vector3<double> pos { get; private set; }
 
 		public Anod()
 		{
 		}
 		public void Init(int L)
 		{
-			pos = new Vector3(L / 2, 0, Za);
+			pos = new Vector3<double>(L / 2, 0, Za);
 		}
 	}
 	[System.Serializable]
@@ -414,119 +389,5 @@ namespace CP_ParallelPipesForm
 		//	int size = 1;
 		//	return getSlauResult(startCoord, size);
 		//}
-	}
-	[System.Serializable]
-	public class LinearSystem
-	{
-		[field: NonSerializedAttribute()]
-		private double[,] a_matrix;
-		[field: NonSerializedAttribute()]
-		private double[] b_vector;
-		[field: NonSerializedAttribute()]
-		private double eps;
-		[field: NonSerializedAttribute()]
-		private int size;
-
-		private double[] x_vector;
-		public LinearSystem(double[,] a_matrix, double[] b_vector)
-			: this(a_matrix, b_vector, 1e-16)
-		{
-		}
-		public LinearSystem(double[,] a_matrix, double[] b_vector, double eps)
-		{
-			int b_length = b_vector.Length;
-			int a_length = a_matrix.Length;
-			this.a_matrix = a_matrix;
-			this.b_vector = b_vector;
-			this.x_vector = new double[b_length];
-			this.size = b_length;
-			this.eps = eps;
-			GaussSolve();
-		}
-		public double[] XVector
-		{
-			get
-			{
-				return x_vector;
-			}
-		}
-		private int[] InitIndex()
-		{
-			int[] index = new int[size];
-			for (int i = 0; i < index.Length; ++i)
-				index[i] = i;
-			return index;
-		}
-		private double FindR(int row, int[] index)
-		{
-			int max_index = row;
-			double max = a_matrix[row, index[max_index]];
-			double max_abs = Math.Abs(max);
-
-			for (int cur_index = row + 1; cur_index < size; ++cur_index)
-			{
-				double cur = a_matrix[row, index[cur_index]];
-				double cur_abs = Math.Abs(cur);
-				if (cur_abs > max_abs)
-				{
-					max_index = cur_index;
-					max = cur;
-					max_abs = cur_abs;
-				}
-			}
-
-			if (max_abs < eps)
-			{
-				if (Math.Abs(b_vector[row]) > eps)
-					throw new Exception("Система уравнений несовместна.");
-				else
-					throw new Exception("Система уравнений имеет множество решений..");
-			}
-			int temp = index[row];
-			index[row] = index[max_index];
-			index[max_index] = temp;
-			return max;
-		}
-		private void GaussSolve()
-		{
-			int[] index = InitIndex();
-			GaussForwardStroke(index);
-			GaussBackwardStroke(index);
-		}
-
-		private void GaussForwardStroke(int[] index)
-		{
-			for (int i = 0; i < size; ++i)
-			{
-
-					double r = FindR(i, index);
-					for (int j = 0; j < size; ++j)
-						a_matrix[i, j] /= r;
-					b_vector[i] /= r;
-					for (int k = i + 1; k < size; ++k)
-					{
-
-						double p = a_matrix[k, index[i]];
-						for (int j = i; j < size; ++j)
-							a_matrix[k, index[j]] -= a_matrix[i, index[j]] * p;
-						b_vector[k] -= b_vector[i] * p;
-						a_matrix[k, index[i]] = 0.0;
-					}
-				
-			}
-		}
-
-		private void GaussBackwardStroke(int[] index)
-		{
-			for (int i = size - 1; i >= 0; --i)
-			{
-				double x_i = b_vector[i];
-				for (int j = i + 1; j < size; ++j)
-				{
-					x_i -= x_vector[index[j]] * a_matrix[i, index[j]];
-				}
-				x_vector[index[i]] = x_i;
-			}
-		}
 	}
 }

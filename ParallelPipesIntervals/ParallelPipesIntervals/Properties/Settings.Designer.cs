@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CP_ParallelPipesForm.Properties {
+namespace ParallelPipesIntervals.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

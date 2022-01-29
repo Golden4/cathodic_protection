@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace CP_ParallelPipesForm
+namespace ParallelPipesIntervals
 {
     public partial class MainForm : Form
     {

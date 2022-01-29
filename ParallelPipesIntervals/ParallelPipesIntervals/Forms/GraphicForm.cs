@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Collections.Generic;
 using System.IO;
 
-namespace CP_ParallelPipesForm
+namespace ParallelPipesIntervals
 {
     public partial class GraphicForm : Form
     {

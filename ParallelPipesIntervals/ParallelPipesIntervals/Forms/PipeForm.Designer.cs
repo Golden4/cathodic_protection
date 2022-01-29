@@ -1,4 +1,4 @@
-﻿namespace CP_ParallelPipesForm
+﻿namespace ParallelPipesIntervals
 {
     partial class PipeForm
     {
