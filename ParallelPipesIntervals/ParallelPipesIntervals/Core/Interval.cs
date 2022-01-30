@@ -2,12 +2,12 @@
 
 namespace ParallelPipesIntervals.Core
 {
-    public struct IntervalDouble : IComparable<IntervalDouble>
+    public struct Interval : IComparable<Interval>
     {
         public double x1;
         public double x2;
         
-        public IntervalDouble(double x1, double x2)
+        public Interval(double x1, double x2)
         {
             if (x1 < x2)
             {
@@ -21,24 +21,24 @@ namespace ParallelPipesIntervals.Core
             }
         }
         
-        public IntervalDouble Log()
+        public Interval Log()
         {
-            return new IntervalDouble((double) Math.Log(x1), (double) Math.Log(x2));
+            return new Interval((double) Math.Log(x1), (double) Math.Log(x2));
         }
 
-        public IntervalDouble Sin()
+        public Interval Sin()
         {
-            return new IntervalDouble((double) Math.Sin(x1), (double) Math.Sin(x2));
+            return new Interval((double) Math.Sin(x1), (double) Math.Sin(x2));
         }
 
-        public IntervalDouble Abs()
+        public Interval Abs()
         {
-            return new IntervalDouble((double) Math.Abs(x1), (double) Math.Abs(x2));
+            return new Interval((double) Math.Abs(x1), (double) Math.Abs(x2));
         }
 
-        public IntervalDouble Sqrt()
+        public Interval Sqrt()
         {
-            return new IntervalDouble((double) Math.Sqrt(x1), (double) Math.Sqrt(x2));
+            return new Interval((double) Math.Sqrt(x1), (double) Math.Sqrt(x2));
         }
         
         public double Mid()
@@ -51,22 +51,22 @@ namespace ParallelPipesIntervals.Core
             return Math.Abs(x1 - x2) / 2d;
         }
 
-        public static IntervalDouble operator +(IntervalDouble a, IntervalDouble b)
+        public static Interval operator +(Interval a, Interval b)
         {
-            return new IntervalDouble(a.x1 + b.x1, a.x2 + b.x2);
+            return new Interval(a.x1 + b.x1, a.x2 + b.x2);
         }
 
-        public static IntervalDouble operator -(IntervalDouble a, IntervalDouble b)
+        public static Interval operator -(Interval a, Interval b)
         {
-            return new IntervalDouble(a.x1 - b.x2, a.x2 - b.x1);
+            return new Interval(a.x1 - b.x2, a.x2 - b.x1);
         }
 
-        public static IntervalDouble operator -(IntervalDouble a)
+        public static Interval operator -(Interval a)
         {
-            return new IntervalDouble(-a.x1, -a.x2);
+            return new Interval(-a.x1, -a.x2);
         }
 
-        public static IntervalDouble operator *(IntervalDouble a, IntervalDouble b)
+        public static Interval operator *(Interval a, Interval b)
         {
             double min1 = Math.Min(a.x1 * b.x1, a.x1 * b.x2);
             double min2 = Math.Min(a.x2 * b.x1, a.x2 * b.x2);
@@ -74,45 +74,60 @@ namespace ParallelPipesIntervals.Core
             double max1 = Math.Max(a.x1 * b.x1, a.x1 * b.x2);
             double max2 = Math.Max(a.x2 * b.x1, a.x2 * b.x2);
             double max0 = Math.Max(max2, max1);
-            return new IntervalDouble(min0, max0);
+            return new Interval(min0, max0);
         }
 
-        public static IntervalDouble operator /(IntervalDouble a, IntervalDouble b)
+        public static Interval operator /(Interval a, Interval b)
         {
             return (1f / b) * a;
         }
-
-        public static IntervalDouble operator *(double a, IntervalDouble b)
+        
+        public static Interval operator +(double a, Interval b)
         {
-            return new IntervalDouble(a * b.x1, a * b.x2);
+            return new Interval(a + b.x1, a + b.x2);
         }
 
-        public static IntervalDouble operator /(double a, IntervalDouble b)
+        public static Interval operator *(double a, Interval b)
         {
-            return new IntervalDouble(a / b.x1, a / b.x2);
+            return new Interval(a * b.x1, a * b.x2);
         }
 
-        public static IntervalDouble operator +(double a, IntervalDouble b)
+        public static Interval operator /(double a, Interval b)
         {
-            return new IntervalDouble(a + b.x1, a + b.x2);
+            return new Interval(a / b.x1, a / b.x2);
         }
 
-        public static bool operator >(IntervalDouble a, IntervalDouble b)
+        public static Interval operator +(Interval b, double a)
+        {
+            return new Interval(b.x1 + a, b.x2 + a);
+        }
+        
+        public static Interval operator *(Interval b, double a)
+        {
+            return new Interval(b.x1 * a, b.x2 * a);
+        }
+
+        public static Interval operator /(Interval b, double a)
+        {
+            return new Interval(b.x1 / a, b.x2 / a);
+        }
+
+        public static bool operator >(Interval a, Interval b)
         {
             return a.CompareTo(b) > 0;
         }
 
-        public static bool operator <(IntervalDouble a, IntervalDouble b)
+        public static bool operator <(Interval a, Interval b)
         {
             return a.CompareTo(b) < 0;
         }
 
-        public static bool operator >=(IntervalDouble a, IntervalDouble b)
+        public static bool operator >=(Interval a, Interval b)
         {
             return a.CompareTo(b) >= 0;
         }
 
-        public static bool operator <=(IntervalDouble a, IntervalDouble b)
+        public static bool operator <=(Interval a, Interval b)
         {
             return a.CompareTo(b) <= 0;
         }
@@ -128,7 +143,7 @@ namespace ParallelPipesIntervals.Core
                 Math.Round(x1, num).ToString(format), Math.Round(x2, num).ToString(format));
         }
 
-        public int CompareTo(IntervalDouble other)
+        public int CompareTo(Interval other)
         {
             return (x2).CompareTo(other.x1);
         }

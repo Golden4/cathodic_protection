@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B4BDF799-484B-47B7-935A-EB36DAA646BB}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>ParallelPipesIntervals</RootNamespace>
     <AssemblyName>ParallelPipesIntervals</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CatodicProtection\CPProgram.cs" />
+    <Compile Include="Core\Interpolation.cs" />
     <Compile Include="Core\Interval.cs" />
     <Compile Include="Core\LinearSystem.cs" />
     <Compile Include="Core\Vector3.cs" />
@@ -82,6 +83,12 @@
     </Compile>
     <Compile Include="Forms\GraphicForm.Designer.cs">
       <DependentUpon>GraphicForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\IntervalForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\IntervalForm.Designer.cs">
+      <DependentUpon>IntervalForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
@@ -105,6 +112,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\GraphicForm.resx">
       <DependentUpon>GraphicForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\IntervalForm.resx">
+      <DependentUpon>IntervalForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -138,6 +148,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Utils" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -266,5 +266,11 @@ namespace ParallelPipesIntervals
             ResultForm.LoadResultFromFile();
 
         }
+
+        private void UprButtonGraph_Click(object sender, EventArgs e)
+        {
+            var iform = new IntervalForm(cp);
+            iform.Show();
+        }
     }
 }

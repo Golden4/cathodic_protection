@@ -4,6 +4,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 using System.Drawing;
 using System.Collections.Generic;
 using System.IO;
+using ParallelPipesIntervals.Core;
 
 namespace ParallelPipesIntervals
 {
@@ -12,9 +13,9 @@ namespace ParallelPipesIntervals
         public string name;
         public string issledName;
 
-        public static List<Color> colors = ChartColorPallets.BrightPastel;
+        public static List<Color> colors = ChartColorPallets.Fire;
 
-        public GraphicForm(string graphName,string name,string issledName)
+        public GraphicForm(string graphName, string name, string issledName)
         {
             this.name = name;
             this.issledName = issledName;
@@ -28,14 +29,14 @@ namespace ParallelPipesIntervals
             chart1.ChartAreas[0].AxisY.Title = graphName;
         }
 
-        public void ShowChart(string chartName,int index, double[] x, double[] y)
+        public void ShowChart(string chartName, int index, double[] x, double[] y)
         {
             try
             {
                 Series newSeries = new Series(chartName);
                 newSeries.Points.Clear();
                 newSeries.ChartType = SeriesChartType.Line;
-                newSeries.MarkerStyle = MarkerStyle.Circle;
+                newSeries.MarkerStyle = MarkerStyle.Diamond;
                 chart1.Series.Add(newSeries);
                 newSeries.Color = colors[index];
 
@@ -43,7 +44,8 @@ namespace ParallelPipesIntervals
                 {
                     chart1.Series[chart1.Series.Count - 1].Points.AddXY(x[i], y[i]);
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -58,7 +60,7 @@ namespace ParallelPipesIntervals
                 newSeries.ChartType = SeriesChartType.Line;
                 newSeries.MarkerStyle = MarkerStyle.Circle;
                 chart1.Series.Add(newSeries);
-
+                newSeries.Color = ChartColorPallets.Fire[chart1.Series.Count - 1];
                 for (int i = 0; i < x.Length; i++)
                 {
                     chart1.Series[chart1.Series.Count - 1].Points.AddXY(x[i], y[i]);
@@ -69,6 +71,22 @@ namespace ParallelPipesIntervals
                 MessageBox.Show(ex.Message);
             }
         }
+        
+        public void ShowChart(string chartName, double[] x, Interval[] y)
+        {
+            var y1 = new double[y.Length];
+            var y2 = new double[y.Length];
+            var yMid = new double[y.Length];
+            for (int i = 0; i < y.Length; i++)
+            {
+                y1[i] = y[i].x1;
+                y2[i] = y[i].x2;
+                yMid[i] = y[i].Mid();
+            }
+            ShowChart(chartName + "Нач", x, y1);
+            ShowChart(chartName + "Ср", x, yMid);
+            ShowChart(chartName + "Кон", x, y2);
+        }
 
         private void SaveGraphButton_Click(object sender, EventArgs e)
         {
@@ -78,9 +96,9 @@ namespace ParallelPipesIntervals
 
             for (int i = 0; i < 3; i++)
             {
-                filter += string.Format("{0}|*.{1}", (ChartImageFormat)i, ((ChartImageFormat)i).ToString().ToLower());
+                filter += string.Format("{0}|*.{1}", (ChartImageFormat) i, ((ChartImageFormat) i).ToString().ToLower());
 
-                if(i != 2)
+                if (i != 2)
                 {
                     filter += "|";
                 }
@@ -89,11 +107,11 @@ namespace ParallelPipesIntervals
             saveFileDialog.Filter = filter;
             saveFileDialog.RestoreDirectory = true;
             saveFileDialog.FilterIndex = 0;
-            saveFileDialog.FileName = "График"+name+issledName;
+            saveFileDialog.FileName = "График" + name + issledName;
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                chart1.SaveImage(saveFileDialog.FileName, (ChartImageFormat)saveFileDialog.FilterIndex);
+                chart1.SaveImage(saveFileDialog.FileName, (ChartImageFormat) saveFileDialog.FilterIndex);
             }
         }
 
@@ -123,49 +141,52 @@ namespace ParallelPipesIntervals
                             value += lines[i][j];
                             values.Add(value);
                             value = "";
-                        } else
+                        }
+                        else
                         {
                             if (value == "" && lines[i][j] == ' ')
                             {
-                               
-                            } else
+                            }
+                            else
                             {
                                 value += lines[i][j];
                             }
                         }
 
-                        if(lines[i].Length-1 == j)
+                        if (lines[i].Length - 1 == j)
                         {
-
                             allValues.Add(values);
                         }
                     }
                 }
 
                 string[] names = new string[allValues[0].Count];
-                double[] xValues = new double[allValues.Count-1];
+                double[] xValues = new double[allValues.Count - 1];
                 double[][] yValues = new double[allValues[1].Count][];
 
                 for (int i = 0; i < allValues.Count; i++)
                 {
                     for (int j = 0; j < allValues[i].Count; j++)
                     {
-                        if (i == 0) {
+                        if (i == 0)
+                        {
                             names[j] = allValues[0][j];
-                            yValues[j] = new double[allValues.Count-1];
-                        } else {
+                            yValues[j] = new double[allValues.Count - 1];
+                        }
+                        else
+                        {
                             try
                             {
                                 if (j == 0)
                                 {
-                                    
-                                    xValues[i-1] = double.Parse(allValues[i][j]);
+                                    xValues[i - 1] = double.Parse(allValues[i][j]);
                                 }
                                 else
                                 {
-                                    yValues[j - 1][i-1] = double.Parse(allValues[i][j]);
+                                    yValues[j - 1][i - 1] = double.Parse(allValues[i][j]);
                                 }
-                            } catch(Exception ex)
+                            }
+                            catch (Exception ex)
                             {
                                 MessageBox.Show(ex.Message);
                                 return;
@@ -176,7 +197,7 @@ namespace ParallelPipesIntervals
 
                 for (int i = 1; i < allValues[1].Count; i++)
                 {
-                    ShowChart(names[i], xValues, yValues[i-1]);
+                    ShowChart(names[i], xValues, yValues[i - 1]);
                 }
             }
         }
@@ -184,9 +205,9 @@ namespace ParallelPipesIntervals
 
     public static class ChartColorPallets
     {
-
         public static List<Color> Bright
-            => new List<Color>() {
+            => new List<Color>()
+            {
                 "#008000".FromHex(),
                 "#0000FF".FromHex(),
                 "#800080".FromHex(),
@@ -203,9 +224,11 @@ namespace ParallelPipesIntervals
                 "#C0C0C0".FromHex(),
                 "#FF6347".FromHex(),
                 "#FFE4B5".FromHex()
-        };
+            };
+
         public static List<Color> GreyScale
-            => new List<Color>() {
+            => new List<Color>()
+            {
                 "#C8C8C8".FromHex(),
                 "#BDBDBD".FromHex(),
                 "#B2B2B2".FromHex(),
@@ -222,9 +245,11 @@ namespace ParallelPipesIntervals
                 "#393939".FromHex(),
                 "#2E2E2E".FromHex(),
                 "#232323".FromHex()
-        };
+            };
+
         public static List<Color> Excel
-            => new List<Color>() {
+            => new List<Color>()
+            {
                 "#9999FF".FromHex(),
                 "#993366".FromHex(),
                 "#FFFFCC".FromHex(),
@@ -241,9 +266,11 @@ namespace ParallelPipesIntervals
                 "#800000".FromHex(),
                 "#008080".FromHex(),
                 "#0000FF".FromHex()
-        };
+            };
+
         public static List<Color> Light
-            => new List<Color>() {
+            => new List<Color>()
+            {
                 "#E6E6FA".FromHex(),
                 "#FFF0F5".FromHex(),
                 "#FFDAB9".FromHex(),
@@ -254,9 +281,11 @@ namespace ParallelPipesIntervals
                 "#F5F5F5".FromHex(),
                 "#FAEBD7".FromHex(),
                 "#E0FFFF".FromHex()
-        };
+            };
+
         public static List<Color> Pastel
-            => new List<Color>() {
+            => new List<Color>()
+            {
                 "#87CEEB".FromHex(),
                 "#32CD32".FromHex(),
                 "#BA55D3".FromHex(),
@@ -273,9 +302,11 @@ namespace ParallelPipesIntervals
                 "#5F9EA0".FromHex(),
                 "#FFDAB9".FromHex(),
                 "#FFA07A".FromHex()
-        };
+            };
+
         public static List<Color> EarthTones
-            => new List<Color>() {
+            => new List<Color>()
+            {
                 "#FF8000".FromHex(),
                 "#B8860B".FromHex(),
                 "#C04000".FromHex(),
@@ -292,9 +323,11 @@ namespace ParallelPipesIntervals
                 "#B22222".FromHex(),
                 "#8B4513".FromHex(),
                 "#C00000".FromHex()
-        };
+            };
+
         public static List<Color> SemiTransparent
-            => new List<Color>() {
+            => new List<Color>()
+            {
                 "#FF0000".FromHex(),
                 "#00FF00".FromHex(),
                 "#0000FF".FromHex(),
@@ -311,9 +344,11 @@ namespace ParallelPipesIntervals
                 "#AA7814".FromHex(),
                 "#647832".FromHex(),
                 "#285A96".FromHex()
-        };
+            };
+
         public static List<Color> Berry
-            => new List<Color>() {
+            => new List<Color>()
+            {
                 "#8A2BE2".FromHex(),
                 "#BA55D3".FromHex(),
                 "#4169E1".FromHex(),
@@ -325,9 +360,11 @@ namespace ParallelPipesIntervals
                 "#C000C0".FromHex(),
                 "#0000CD".FromHex(),
                 "#800080".FromHex()
-        };
+            };
+
         public static List<Color> Chocolate
-            => new List<Color>() {
+            => new List<Color>()
+            {
                 "#A0522D".FromHex(),
                 "#D2691E".FromHex(),
                 "#8B0000".FromHex(),
@@ -338,9 +375,11 @@ namespace ParallelPipesIntervals
                 "#C04000".FromHex(),
                 "#B22222".FromHex(),
                 "#B65C3A".FromHex()
-        };
+            };
+
         public static List<Color> Fire
-            => new List<Color>() {
+            => new List<Color>()
+            {
                 "#FFD700".FromHex(),
                 "#FF0000".FromHex(),
                 "#FF1493".FromHex(),
@@ -351,9 +390,11 @@ namespace ParallelPipesIntervals
                 "#FF4500".FromHex(),
                 "#C71585".FromHex(),
                 "#DDE221".FromHex()
-        };
+            };
+
         public static List<Color> SeaGreen
-            => new List<Color>() {
+            => new List<Color>()
+            {
                 "#2E8B57".FromHex(),
                 "#66CDAA".FromHex(),
                 "#4682B4".FromHex(),
@@ -364,9 +405,11 @@ namespace ParallelPipesIntervals
                 "#B0C4DE".FromHex(),
                 "#8FBC8B".FromHex(),
                 "#87CEEB".FromHex()
-        };
+            };
+
         public static List<Color> BrightPastel
-            => new List<Color>() {
+            => new List<Color>()
+            {
                 "#418CF0".FromHex(),
                 "#FCB441".FromHex(),
                 "#E0400A".FromHex(),
@@ -382,7 +425,8 @@ namespace ParallelPipesIntervals
                 "#F1B9A8".FromHex(),
                 "#E0830A".FromHex(),
                 "#7893BE".FromHex()
-        };
+            };
+
         private static Color FromHex(this string hex) => ColorTranslator.FromHtml(hex);
     }
 }
