@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Diagnostics;
+using ParallelPipesIntervals.Core;
 
 namespace ParallelPipesIntervals
 {
@@ -21,7 +22,7 @@ namespace ParallelPipesIntervals
             ro_gText.Text = cp.ro_g.ToString();
         }
 
-        public CP cp = new CP();
+        public CP<Interval> cp = new CP<Interval>();
 
         bool SetFormValues()
         {
@@ -35,7 +36,7 @@ namespace ParallelPipesIntervals
                 cp.ro_g = double.Parse(ro_gText.Text);
                 return true;
             }
-            catch (Exception )
+            catch (Exception)
             {
                 MessageBox.Show("Некорректные данные!");
             }
@@ -190,7 +191,7 @@ namespace ParallelPipesIntervals
                 return;
             }
 
-            Pipe pipe = new Pipe();
+            Pipe<Interval> pipe = new Pipe<Interval>();
             pipe.name = "Труба " + (pipesCount + 1);
 
             PipeForm pf = new PipeForm(pipe, ()=> {
@@ -255,7 +256,7 @@ namespace ParallelPipesIntervals
             text += "\r\n - Болотнов А.М. Автор алгоритмов для расчета электрических полей катодной защиты";
             text += "\r\n - Алсынбаев Ф.С. Создатель программы и алгоритма для случая паралельных труб";
             text += "\r\n--------------------------------------------------------------------------------------";
-            text += "\r\nСпециально для ВКР. УФА - 2020";
+            text += "\r\nСпециально для ВКР. УФА - 2022";
             text += "\r\n--------------------------------------------------------------------------------------";
             text += "\r\nВерсия программы: " + version;
             MessageBox.Show(text, "О программе");
@@ -264,12 +265,33 @@ namespace ParallelPipesIntervals
         private void LoadResultsMenuItemClick(object sender, EventArgs e)
         {
             ResultForm.LoadResultFromFile();
-
         }
 
+        private double[] x;
+        private Interval[] y;
+        
         private void UprButtonGraph_Click(object sender, EventArgs e)
         {
-            var iform = new IntervalForm(cp);
+            if (x == null)
+            {
+                x = new double[3]
+                {
+                    0, 20000, cp.L
+                };
+                y = new Interval[3]
+                {
+                    new Interval(200, 500),
+                    new Interval(350, 350),
+                    new Interval(200, 500)
+                };
+            }
+
+            var iform = new IntervalForm(x, y, cp.Nfi);
+            iform.onResult += (o, args) =>
+            {
+                x = args.x;
+                y = args.y;
+            };
             iform.Show();
         }
     }

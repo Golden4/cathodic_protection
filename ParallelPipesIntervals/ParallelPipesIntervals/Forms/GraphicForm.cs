@@ -71,7 +71,7 @@ namespace ParallelPipesIntervals
                 MessageBox.Show(ex.Message);
             }
         }
-        
+
         public void ShowChart(string chartName, double[] x, Interval[] y)
         {
             var y1 = new double[y.Length];
@@ -86,6 +86,43 @@ namespace ParallelPipesIntervals
             ShowChart(chartName + "Нач", x, y1);
             ShowChart(chartName + "Ср", x, yMid);
             ShowChart(chartName + "Кон", x, y2);
+        }
+
+        public void ShowChart(string chartName, double[] x, double[] y, int interpolatedPointCount)
+        {
+            var xG = new double[interpolatedPointCount];
+            var yG = new double[interpolatedPointCount];
+            for (int i = 0; i < interpolatedPointCount; i++)
+            {
+                xG[i] = i * x[x.Length - 1] / (interpolatedPointCount - 1);
+                yG[i] = Interpolation.LinearInterpolation(xG[i], x, y); // new IntervalDouble(startInt, endInt);
+            }
+            ShowChart(chartName, xG, yG);
+        }
+
+        public void ShowChart(string chartName, double[] x, Interval[] y, int interpolatedPointCount)
+        {
+            var xG = new double[interpolatedPointCount];
+            var yG = new Interval[interpolatedPointCount];
+            for (int i = 0; i < interpolatedPointCount; i++)
+            {
+                xG[i] = i * x[x.Length - 1] / (interpolatedPointCount - 1);
+                yG[i] = Interpolation.LinearInterpolation(xG[i], x, y); // new IntervalDouble(startInt, endInt);
+            }
+            ShowChart(chartName, xG, yG);
+        }
+        
+        public void ShowChart<T>(string chartName, double[] x, T[] y)
+        {
+            Type type = typeof(T);
+            if (type == typeof(Interval))
+            {
+                ShowChart(chartName, x, (Interval[])(dynamic)y);
+            }
+            else
+            {
+                ShowChart(chartName, x, (double[])(dynamic)y);
+            }
         }
 
         private void SaveGraphButton_Click(object sender, EventArgs e)

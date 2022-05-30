@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Globalization;
 using System.Text;
 
@@ -28,13 +27,6 @@ namespace ParallelPipesIntervals.Core
             this._y = y;
             this._z = z;
         }
-        static bool IsPropertyOrMethodExist(dynamic settings, string name)
-        {
-            if (settings is ExpandoObject)
-                return ((IDictionary<string, object>)settings).ContainsKey(name);
-            return settings.GetType().GetMethod(name) != null || settings.GetType().GetProperty(name) != null;
-        }
-
         public static float Dot(Vector3<T> vector1, Vector3<T> vector2) =>
             ((dynamic) vector1.X * vector2.X + (dynamic) vector1.Y * vector2.Y + (dynamic) vector1.Z * vector2.Z);
 
@@ -48,22 +40,12 @@ namespace ParallelPipesIntervals.Core
 
         public static Vector3<T> Abs(Vector3<T> value)
         {
-            dynamic x = value.X;
-            dynamic y = value.Y;
-            dynamic z = value.Z;
-            return new Vector3<T>(IsPropertyOrMethodExist(x, "Abs") ? x.Abs() : Math.Abs(x), 
-                IsPropertyOrMethodExist(y, "Abs") ? y.Abs() : Math.Abs(y),
-                IsPropertyOrMethodExist(z, "Abs") ? z.Abs() : Math.Abs(z));
+            return new Vector3<T>(Funcs.Abs(value.X), Funcs.Abs(value.Y), Funcs.Abs(value.Z));
         }
 
         public static Vector3<T> Sqrt(Vector3<T> value)
         {
-            dynamic x = value.X;
-            dynamic y = value.Y;
-            dynamic z = value.Z;
-            return new Vector3<T>(IsPropertyOrMethodExist(x, "Sqrt") ? x.Sqrt() : Math.Sqrt(x), 
-                IsPropertyOrMethodExist(y, "Sqrt") ? y.Sqrt() : Math.Sqrt(y),
-                IsPropertyOrMethodExist(z, "Sqrt") ? z.Sqrt() : Math.Sqrt(z));
+            return new Vector3<T>(Funcs.Sqrt(value.X), Funcs.Sqrt(value.Y), Funcs.Sqrt(value.Z));
         }
 
         public static Vector3<T> operator +(Vector3<T> left, Vector3<T> right) =>
@@ -107,7 +89,7 @@ namespace ParallelPipesIntervals.Core
         public static T Distance(Vector3<T> v1, Vector3<T> v2)
         {
             dynamic sum = DistanceSquared(v1, v2);
-            return IsPropertyOrMethodExist(sum, "Sqrt") ? sum.Sqrt() : Math.Sqrt(sum);
+            return Funcs.Sqrt(sum);
         }
 
         public override string ToString() => this.ToString("G", (IFormatProvider) CultureInfo.CurrentCulture);

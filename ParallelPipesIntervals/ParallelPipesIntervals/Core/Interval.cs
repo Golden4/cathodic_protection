@@ -2,11 +2,12 @@
 
 namespace ParallelPipesIntervals.Core
 {
+    [Serializable]
     public struct Interval : IComparable<Interval>
     {
         public double x1;
         public double x2;
-        
+
         public Interval(double x1, double x2)
         {
             if (x1 < x2)
@@ -20,27 +21,27 @@ namespace ParallelPipesIntervals.Core
                 this.x2 = x1;
             }
         }
-        
+
         public Interval Log()
         {
-            return new Interval((double) Math.Log(x1), (double) Math.Log(x2));
+            return new Interval(Math.Log(x1), Math.Log(x2));
         }
 
         public Interval Sin()
         {
-            return new Interval((double) Math.Sin(x1), (double) Math.Sin(x2));
+            return new Interval(Math.Sin(x1), Math.Sin(x2));
         }
 
         public Interval Abs()
         {
-            return new Interval((double) Math.Abs(x1), (double) Math.Abs(x2));
+            return new Interval(Math.Abs(x1), Math.Abs(x2));
         }
 
         public Interval Sqrt()
         {
-            return new Interval((double) Math.Sqrt(x1), (double) Math.Sqrt(x2));
+            return new Interval(Math.Sqrt(x1), Math.Sqrt(x2));
         }
-        
+
         public double Mid()
         {
             return (x1 + x2) / 2d;
@@ -79,12 +80,17 @@ namespace ParallelPipesIntervals.Core
 
         public static Interval operator /(Interval a, Interval b)
         {
-            return (1f / b) * a;
+            return (1d / b) * a;
         }
-        
+
         public static Interval operator +(double a, Interval b)
         {
             return new Interval(a + b.x1, a + b.x2);
+        }
+
+        public static Interval operator -(double a, Interval b)
+        {
+            return new Interval(a, a) - b;
         }
 
         public static Interval operator *(double a, Interval b)
@@ -101,7 +107,11 @@ namespace ParallelPipesIntervals.Core
         {
             return new Interval(b.x1 + a, b.x2 + a);
         }
-        
+        public static Interval operator -(Interval a, double b)
+        {
+            return a - new Interval(b, b);
+        }
+
         public static Interval operator *(Interval b, double a)
         {
             return new Interval(b.x1 * a, b.x2 * a);
@@ -112,24 +122,27 @@ namespace ParallelPipesIntervals.Core
             return new Interval(b.x1 / a, b.x2 / a);
         }
 
+        public static explicit operator Interval(double b) => new Interval(b, b);
+
         public static bool operator >(Interval a, Interval b)
         {
-            return a.CompareTo(b) > 0;
+            return a.x1 > b.x2;
+            // return a.CompareTo(b) > 0;
+        }
+        
+        public static bool operator >=(Interval a, Interval b)
+        {
+            return a.x1 >= b.x2;
         }
 
         public static bool operator <(Interval a, Interval b)
         {
-            return a.CompareTo(b) < 0;
-        }
-
-        public static bool operator >=(Interval a, Interval b)
-        {
-            return a.CompareTo(b) >= 0;
+            return a.x2 < b.x1;
         }
 
         public static bool operator <=(Interval a, Interval b)
         {
-            return a.CompareTo(b) <= 0;
+            return a.x2 <= b.x1;
         }
 
         public override string ToString()

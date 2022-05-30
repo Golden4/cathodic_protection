@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
+using ParallelPipesIntervals.Core;
 
 namespace ParallelPipesIntervals
 {
@@ -20,9 +21,9 @@ namespace ParallelPipesIntervals
             }
         }
 
-        CP cp;
+        CP<Interval> cp;
 
-        public ResultForm(CP cp) : this()
+        public ResultForm(CP<Interval> cp) : this()
         {
             if (cp.name != "")
             {
@@ -35,14 +36,14 @@ namespace ParallelPipesIntervals
             InitComboBoxes();
         }
 
-        public ResultForm(string name, CP cp, TimeSpan calcTime) : this()
+        public ResultForm(string name, CP<Interval> cp, TimeSpan calcTime) : this()
         {
             if (cp.name != "")
             {
                 Text = "Результаты вычислений для исследования " + cp.name;
             }
 
-            this.cp = DeepCopy<CP>(cp);
+            this.cp = DeepCopy<CP<Interval>>(cp);
 
             dateTimeLabel.Text = "Дата: " + cp.dateTime.ToString();
             CalcTimeText.Text = string.Format("Время вычисления: {0} мин. {1} сек. {2} мс.", calcTime.Minutes,
@@ -77,11 +78,11 @@ namespace ParallelPipesIntervals
                     cp.getItx);
             };
 
-            SaveUtgButton.Click += (object s, EventArgs e) => { saveResultsToFile(cp.getUtg, "Ut{0}g "); };
-            SaveUtmButton.Click += (object s, EventArgs e) => { saveResultsToFile(cp.getUtm, "Ut{0}m "); };
-            SaveItgButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getItg, "It{0}g "); };
-            SaveItxButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getItx, "It{0}x "); };
-            SaveUprButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getUtpr, "Ut{0}pr"); };
+            // SaveUtgButton.Click += (object s, EventArgs e) => { saveResultsToFile(cp.getUtg, "Ut{0}g "); };
+            // SaveUtmButton.Click += (object s, EventArgs e) => { saveResultsToFile(cp.getUtm, "Ut{0}m "); };
+            // SaveItgButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getItg, "It{0}g "); };
+            // SaveItxButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getItx, "It{0}x "); };
+            // SaveUprButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getUtpr, "Ut{0}pr"); };
         }
 
         void InitComboBoxes()
@@ -99,9 +100,8 @@ namespace ParallelPipesIntervals
                 }
             }
         }
-
-        private void graphicBtn_Click(string graphName, string name, string issledName, ComboBox comboBox,
-            Func<int, double[][]> points)
+        private void graphicBtn_Click<T>(string graphName, string name, string issledName, ComboBox comboBox,
+            Func<int, (double[] x, T[] y)> points)
         {
             GraphicForm gf = new GraphicForm(graphName, name, issledName);
             gf.Text = "График: " + graphName;
@@ -110,15 +110,18 @@ namespace ParallelPipesIntervals
             {
                 for (int i = 0; i < cp.Pipes.Count; i++)
                 {
-                    double[][] pointss = points(i);
-                    gf.ShowChart(cp.Pipes[i].name, pointss[0], pointss[1]);
+                    (double[] x, T[] y) pointss = points(i);
+                    gf.ShowChart(cp.Pipes[i].name, pointss.x, pointss.y);
                 }
             }
             else
             {
-                double[][] pointss = points(comboBox.SelectedIndex - 1);
-                gf.ShowChart(cp.Pipes[comboBox.SelectedIndex - 1].name, comboBox.SelectedIndex - 1, pointss[0],
-                    pointss[1]);
+                (double[] x, T[] y) pointss = points(comboBox.SelectedIndex - 1);
+                gf.ShowChart(cp.Pipes[comboBox.SelectedIndex - 1].name, pointss.x, pointss.y);
+                // gf.ShowChart(cp.Pipes[comboBox.SelectedIndex - 1].name,
+                //     comboBox.SelectedIndex - 1,
+                //     pointss.x,
+                //     pointss.y);
             }
 
             gf.Show();
@@ -280,8 +283,7 @@ namespace ParallelPipesIntervals
             otherParamsForm.AutoScroll = true;
             otherParamsForm.Show();
         }
-
-
+        
         public static void LoadResultFromFile()
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -292,7 +294,7 @@ namespace ParallelPipesIntervals
                 Stream stream = ofd.OpenFile();
                 BinaryFormatter bf = new BinaryFormatter();
 
-                CP cp = bf.Deserialize(stream) as CP;
+                CP<Interval> cp = bf.Deserialize(stream) as CP<Interval>;
                 stream.Close();
 
                 ResultForm rf = new ResultForm(cp);

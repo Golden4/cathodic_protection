@@ -1,13 +1,14 @@
 using System;
 using System.Windows.Forms;
+using ParallelPipesIntervals.Core;
 
 namespace ParallelPipesIntervals
 {
     public partial class PipeForm : Form
     {
-        Pipe pipe;
+        Pipe<Interval> pipe;
         Action saveClickCallBack;
-        public PipeForm(Pipe pipe, Action saveClickCallBack = null) : this()
+        public PipeForm(Pipe<Interval> pipe, Action saveClickCallBack = null) : this()
         {
             this.pipe = pipe;
             PipeNameText.Text = pipe.name;
