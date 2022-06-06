@@ -70,7 +70,7 @@ namespace CP_ParallelPipesForm
 
         void EditPipe(int index)
         {
-            PipeForm pf = new PipeForm(cp.Pipes[index], cp, ()=> { EditPipeFieldName(cp.Pipes[index].name, index); });
+            PipeForm pf = new PipeForm(cp.Pipes[index], cp, index, ()=> { EditPipeFieldName(cp.Pipes[index].name, index); });
             pf.ShowDialog();
         }
 
@@ -193,8 +193,7 @@ namespace CP_ParallelPipesForm
 
             Pipe pipe = new Pipe();
             pipe.name = "Труба " + (pipesCount + 1);
-
-            PipeForm pf = new PipeForm(pipe, cp, ()=> {
+            PipeForm pf = new PipeForm(pipe, cp, cp.Pipes.Count, ()=> {
                 cp.Pipes.Add(pipe);
                 AddPipesFiels(pipe.name);
             });

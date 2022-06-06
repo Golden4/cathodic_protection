@@ -9,6 +9,9 @@ namespace CP_ParallelPipesForm
     {
         private double[] x;
         private Interval[] y;
+        private string name;
+        private int colorIndex;
+        
         public event EventHandler<ResultEventArgs> onResult;
 
         public class ResultEventArgs : EventArgs
@@ -17,10 +20,12 @@ namespace CP_ParallelPipesForm
             public Interval[] y;
         }
 
-        public SetIntervalForm(double[] x, Interval[] y)
+        public SetIntervalForm(double[] x, Interval[] y, string name, int colorIndex)
         {
             InitializeComponent();
             InitGridView(x, y);
+            this.name = name;
+            this.colorIndex = colorIndex;
         }
 
         public SetIntervalForm(double[] x, double[] y)
@@ -109,7 +114,7 @@ namespace CP_ParallelPipesForm
             if (TryUpdateDataFromGrid())
             {
                 GraphicForm graphicForm = new GraphicForm("Распределение сопротивления изоляции, 0м*м2", "", "");
-                graphicForm.ShowChart("Сопротивления изоляции", x, y, 3, false);
+                graphicForm.ShowChart(name, x, y, colorIndex, false);
                 graphicForm.Show();
             }
         }

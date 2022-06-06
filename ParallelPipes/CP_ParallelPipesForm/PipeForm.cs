@@ -8,9 +8,10 @@ namespace CP_ParallelPipesForm
     {
         Pipe pipe;
         CP cp;
+        private int pipeIndex;
         Action saveClickCallBack;
 
-        public PipeForm(Pipe pipe, CP cp, Action saveClickCallBack = null) : this()
+        public PipeForm(Pipe pipe, CP cp, int pipeIndex, Action saveClickCallBack = null) : this()
         {
             this.pipe = pipe;
             this.cp = cp;
@@ -20,6 +21,7 @@ namespace CP_ParallelPipesForm
             Dt2Text.Text = pipe.Dt2.ToString();
             DetText.Text = pipe.Det.ToString();
             LtaText.Text = pipe.Lta.ToString();
+            this.pipeIndex = pipeIndex;
 
             this.saveClickCallBack = saveClickCallBack;
             SaveButton.Click += SaveButton_Click;
@@ -107,7 +109,7 @@ namespace CP_ParallelPipesForm
                     new Interval(pipe.Ct, pipe.Ct)
                 };
             }
-            var iform = new SetIntervalForm(pipe.CtX, pipe.CtIntervals);
+            var iform = new SetIntervalForm(pipe.CtX, pipe.CtIntervals, pipe.name, pipeIndex);
             iform.onResult += (o, args) =>
             {
                 pipe.CtX = args.x;

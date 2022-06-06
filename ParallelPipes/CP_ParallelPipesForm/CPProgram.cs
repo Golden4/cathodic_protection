@@ -92,6 +92,18 @@ namespace CP_ParallelPipesForm
                 FIs[i] = new Vector3((i * Lfi + Lfi / 2), Lta, (Ht + Rt2));
             }
             iCt = new Interval[Nfi];
+            if (CtIntervals == null)
+            {
+                CtX = new double[2]
+                {
+                    0, L
+                };
+                CtIntervals = new Interval[2]
+                {
+                    new Interval(Ct, Ct),
+                    new Interval(Ct, Ct)
+                };
+            }
             for (int i = 0; i < Nfi; i++)
             {
                 iCt[i] = Interpolation.LinearInterpolation((double) i * L / (Nfi - 1), CtX, CtIntervals);
