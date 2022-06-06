@@ -2,4 +2,4 @@
 
 *Язык - C#*
 
-*IDE - Visual Studio*
+*IDE - Visual Studio/Jetbrains Rider*
