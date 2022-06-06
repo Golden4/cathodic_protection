@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Diagnostics;
+using CP_ParallelPipesForm.Core;
 
 namespace CP_ParallelPipesForm
 {
@@ -18,7 +19,8 @@ namespace CP_ParallelPipesForm
             ZaText.Text = cp.anod.Za.ToString();
             LText.Text = cp.L.ToString();
             NfiText.Text = cp.Nfi.ToString();
-            ro_gText.Text = cp.ro_g.ToString();
+            ro_gText.Text = cp.iRoG.x1.ToString();
+            ro_gText1.Text = cp.iRoG.x2.ToString();
         }
 
         public CP cp = new CP();
@@ -32,7 +34,8 @@ namespace CP_ParallelPipesForm
                 cp.anod.Za = double.Parse(ZaText.Text);
                 cp.L = int.Parse(LText.Text);
                 cp.Nfi = int.Parse(NfiText.Text);
-                cp.ro_g = double.Parse(ro_gText.Text);
+                cp.iRoG.x1 = double.Parse(ro_gText.Text);
+                cp.iRoG.x2 = double.Parse(ro_gText1.Text);
                 return true;
             }
             catch (Exception )
@@ -67,7 +70,7 @@ namespace CP_ParallelPipesForm
 
         void EditPipe(int index)
         {
-            PipeForm pf = new PipeForm(cp.Pipes[index], ()=> { EditPipeFieldName(cp.Pipes[index].name, index); });
+            PipeForm pf = new PipeForm(cp.Pipes[index], cp, ()=> { EditPipeFieldName(cp.Pipes[index].name, index); });
             pf.ShowDialog();
         }
 
@@ -191,7 +194,7 @@ namespace CP_ParallelPipesForm
             Pipe pipe = new Pipe();
             pipe.name = "Труба " + (pipesCount + 1);
 
-            PipeForm pf = new PipeForm(pipe, ()=> {
+            PipeForm pf = new PipeForm(pipe, cp, ()=> {
                 cp.Pipes.Add(pipe);
                 AddPipesFiels(pipe.name);
             });
@@ -262,7 +265,6 @@ namespace CP_ParallelPipesForm
         private void LoadResultsMenuItemClick(object sender, EventArgs e)
         {
             ResultForm.LoadResultFromFile();
-
         }
     }
 }

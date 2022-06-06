@@ -285,7 +285,6 @@ namespace ParallelPipesIntervals
                     new Interval(200, 500)
                 };
             }
-
             var iform = new IntervalForm(x, y, cp.Nfi);
             iform.onResult += (o, args) =>
             {

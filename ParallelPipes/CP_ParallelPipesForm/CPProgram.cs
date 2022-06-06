@@ -58,8 +58,9 @@ namespace CP_ParallelPipesForm
 
         // ======================== ИЗОЛЯЦИЯ ТРУБЫ ========================
         public double Ct = 300000; // уд. сопротивление изоляции трубы, Ом*м2
-        public double[] CtR;
+        public double[] CtX;
         public Interval[] CtIntervals;
+        public Interval[] iCt;
         public double Ctrad = 0.05;
         public double Rct { get; private set; } // сопротивление изоляции трубы, Ом*м
         public double Rct1 { get; private set; } // сопротивление изоляции на единицу длины, Ом*м
@@ -90,19 +91,10 @@ namespace CP_ParallelPipesForm
             {
                 FIs[i] = new Vector3((i * Lfi + Lfi / 2), Lta, (Ht + Rt2));
             }
-
-            var x = new double[3]
-            {
-                0, L / 3, L
-            };
-            var y = new Interval[3]
-            {
-                new Interval(16000, 16000), new Interval(900, 5000), new Interval(10000, 10000)
-            };
-            CtIntervals = new Interval[Nfi];
+            iCt = new Interval[Nfi];
             for (int i = 0; i < Nfi; i++)
             {
-                CtIntervals[i] = Interpolation.LinearInterpolation((double) i * L / (Nfi - 1), x, y);
+                iCt[i] = Interpolation.LinearInterpolation((double) i * L / (Nfi - 1), CtX, CtIntervals);
             }
         }
 
@@ -150,8 +142,8 @@ namespace CP_ParallelPipesForm
 
         // ======================== ГРУНТ =================================
         public double ro_g = 500; // Уд сопр грунта, Ом*м: 5..10000
+        public Interval iRoG = new Interval(500, 500);
         public double Sigma_g { get; private set; } // Удельная электропроводность грунта
-        public double Sgrad = 0.05;
 
         // ======================== ПРОЧЕЕ ================================
 
@@ -203,15 +195,12 @@ namespace CP_ParallelPipesForm
             Interval[][] CtPipes = new Interval[Pipes.Count][];
             for (int i = 0; i < CtPipes.Length; i++)
             {
-                CtPipes[i] = Pipes[i].CtIntervals;
+                CtPipes[i] = Pipes[i].iCt;
             }
 
-            UtprIntervals = getUtprIntervals(new Interval(Sigma_g, Sigma_g),
-                // new Interval(Sigma_g * (1 - Sgrad), Sigma_g * (1 + Sgrad)),
-                CtPipes);
-            ItgIntervals = getItgIntervals(new Interval(Sigma_g, Sigma_g),
-                // new Interval(Sigma_g * (1 - Sgrad), Sigma_g * (1 + Sgrad)),
-                CtPipes);
+            var SigmaGr = 1d / iRoG;
+            UtprIntervals = getUtprIntervals(SigmaGr, CtPipes);
+            ItgIntervals = getItgIntervals(SigmaGr, CtPipes);
         }
 
         public Interval[][] getUtprIntervals(Interval SigmaG, Interval[][] Ct)

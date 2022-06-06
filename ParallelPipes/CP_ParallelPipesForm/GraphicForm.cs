@@ -37,13 +37,13 @@ namespace CP_ParallelPipesForm
             chart1.Legends.Add(new Legend());
         }
 
-        public void ShowChart(string chartName, double[] x, double[] y, int colorIndex = -1)
+        public void ShowChart(string chartName, double[] x, double[] y, int colorIndex = -1, bool useSpline = true)
         {
             try
             {
                 Series newSeries = new Series(chartName);
                 newSeries.Points.Clear();
-                newSeries.ChartType = SeriesChartType.Spline;
+                newSeries.ChartType = useSpline ? SeriesChartType.Spline : SeriesChartType.Line;
                 newSeries.MarkerStyle = MarkerStyle.Circle;
                 newSeries.LabelBorderWidth = 3;
                 newSeries.BorderWidth = 3;
@@ -65,7 +65,7 @@ namespace CP_ParallelPipesForm
             }
         }
 
-        public void ShowChart(string chartName, double[] x, Interval[] y, int colorIndex)
+        public void ShowChart(string chartName, double[] x, Interval[] y, int colorIndex = -1, bool useSpline = true)
         {
             var y1 = new double[y.Length];
             var y2 = new double[y.Length];
@@ -76,9 +76,9 @@ namespace CP_ParallelPipesForm
                 y2[i] = y[i].x2;
                 yMid[i] = y[i].Mid();
             }
-            ShowChart(chartName + ", Нач", x, y1, colorIndex);
-            ShowChart(chartName + ", Ср", x, yMid, colorIndex);
-            ShowChart(chartName + ", Кон", x, y2, colorIndex);
+            ShowChart(chartName + ", Нач", x, y1, colorIndex, useSpline);
+            ShowChart(chartName + ", Ср", x, yMid, colorIndex, useSpline);
+            ShowChart(chartName + ", Кон", x, y2, colorIndex, useSpline);
         }
 
         private void SaveGraphButton_Click(object sender, EventArgs e)

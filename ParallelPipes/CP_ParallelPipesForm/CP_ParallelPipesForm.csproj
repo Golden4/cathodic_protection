@@ -102,6 +102,12 @@
     <Compile Include="ResultForm.Designer.cs">
       <DependentUpon>ResultForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="SetIntervalForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetIntervalForm.Designer.cs">
+      <DependentUpon>SetIntervalForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="GraphicForm.resx">
       <DependentUpon>GraphicForm.cs</DependentUpon>
     </EmbeddedResource>
