@@ -21,43 +21,37 @@ namespace CP_ParallelPipesForm
             this.issledName = issledName;
             InitializeComponent();
             chart1.Series.Clear();
+            chart1.ChartAreas.Clear();
+            chart1.ChartAreas.Add(new ChartArea());
             chart1.ChartAreas[0].AxisX.IsStartedFromZero = false;
             chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;
-            //chart1.ChartAreas[0].AxisY.IsMarginVisible = false;
-            //chart1.ChartAreas[0].AxisX.IsMarginVisible = false;
+            chart1.ChartAreas[0].AxisY.IsMarginVisible = false;
+            chart1.ChartAreas[0].AxisX.IsMarginVisible = false;
             chart1.ChartAreas[0].AxisX.Title = "X, м";
-            chart1.ChartAreas[0].AxisY.Title = graphName;
+            chart1.ChartAreas[0].AxisY.LabelStyle.Format = "0.##E+00";
+            chart1.ChartAreas[0].Position.X = 0;
+            chart1.ChartAreas[0].Position.Width = 97;
+            chart1.ChartAreas[0].Position.Height = 100;
+            chart1.ChartAreas[0].Position.Y = 8;
+            chart1.Titles.Add(graphName);
+            chart1.Legends.Add(new Legend());
         }
 
-        public void ShowChart(string chartName,int index, double[] x, double[] y)
+        public void ShowChart(string chartName, double[] x, double[] y, int colorIndex = -1)
         {
             try
             {
                 Series newSeries = new Series(chartName);
                 newSeries.Points.Clear();
-                newSeries.ChartType = SeriesChartType.Line;
+                newSeries.ChartType = SeriesChartType.Spline;
                 newSeries.MarkerStyle = MarkerStyle.Circle;
-                chart1.Series.Add(newSeries);
-                newSeries.Color = colors[index];
-
-                for (int i = 0; i < x.Length; i++)
+                newSeries.LabelBorderWidth = 3;
+                newSeries.BorderWidth = 3;
+                if (colorIndex > -1)
                 {
-                    chart1.Series[chart1.Series.Count - 1].Points.AddXY(x[i], y[i]);
+                    newSeries.Color = colors[colorIndex];
                 }
-            } catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
 
-        public void ShowChart(string chartName, double[] x, double[] y)
-        {
-            try
-            {
-                Series newSeries = new Series(chartName);
-                newSeries.Points.Clear();
-                newSeries.ChartType = SeriesChartType.Line;
-                newSeries.MarkerStyle = MarkerStyle.Circle;
                 chart1.Series.Add(newSeries);
 
                 for (int i = 0; i < x.Length; i++)
@@ -71,7 +65,7 @@ namespace CP_ParallelPipesForm
             }
         }
 
-        public void ShowChart(string chartName, double[] x, Interval[] y)
+        public void ShowChart(string chartName, double[] x, Interval[] y, int colorIndex)
         {
             var y1 = new double[y.Length];
             var y2 = new double[y.Length];
@@ -82,9 +76,9 @@ namespace CP_ParallelPipesForm
                 y2[i] = y[i].x2;
                 yMid[i] = y[i].Mid();
             }
-            ShowChart(chartName + "Нач", x, y1);
-            ShowChart(chartName + "Ср", x, yMid);
-            ShowChart(chartName + "Кон", x, y2);
+            ShowChart(chartName + ", Нач", x, y1, colorIndex);
+            ShowChart(chartName + ", Ср", x, yMid, colorIndex);
+            ShowChart(chartName + ", Кон", x, y2, colorIndex);
         }
 
         private void SaveGraphButton_Click(object sender, EventArgs e)

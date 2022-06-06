@@ -64,11 +64,11 @@ namespace CP_ParallelPipesForm
             };
             UtgButtonGraph.Click += (object sender, EventArgs e) =>
             {
-                graphicBtn_Click("Потенциал в грунте, Utg, В", "Utg", cp.name, comboBoxUtg, cp.getUtg, cp.getUtgInterval);
+                graphicBtn_Click("Потенциал в грунте, Utg, В", "Utg", cp.name, comboBoxUtg, cp.getUtg);
             };
             UtmButtonGraph.Click += (object sender, EventArgs e) =>
             {
-                graphicBtn_Click("Потенциал в металле, Utm, В", "Utm", cp.name, comboBoxUtm, cp.getUtm, cp.getUtmInterval);
+                graphicBtn_Click("Потенциал в металле, Utm, В", "Utm", cp.name, comboBoxUtm, cp.getUtm);
             };
             ItgButtonGraph.Click += (object sender, EventArgs e) =>
             {
@@ -119,19 +119,19 @@ namespace CP_ParallelPipesForm
                 {
                     if (useIntervals && pointsInterval != null)
                     {
-                        gf.ShowChart(cp.Pipes[i].name, pointsInterval(i).x, pointsInterval(i).y);
+                        gf.ShowChart(cp.Pipes[i].name, pointsInterval(i).x, pointsInterval(i).y, i);
                     }
                     else
                     {
-                        gf.ShowChart(cp.Pipes[i].name, points(i)[0], points(i)[1]);
+                        gf.ShowChart(cp.Pipes[i].name, points(i)[0], points(i)[1], i);
                     }
                 }
             }
             else
             {
                 double[][] pointss = points(comboBox.SelectedIndex - 1);
-                gf.ShowChart(cp.Pipes[comboBox.SelectedIndex - 1].name, comboBox.SelectedIndex - 1, pointss[0],
-                    pointss[1]);
+                gf.ShowChart(cp.Pipes[comboBox.SelectedIndex - 1].name, pointss[0],
+                    pointss[1], comboBox.SelectedIndex - 1);
             }
 
             gf.Show();

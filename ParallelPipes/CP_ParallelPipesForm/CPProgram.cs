@@ -97,7 +97,7 @@ namespace CP_ParallelPipesForm
             };
             var y = new Interval[3]
             {
-                new Interval(16000, 16000), new Interval(15000, 16000), new Interval(10000, 10000)
+                new Interval(16000, 16000), new Interval(900, 5000), new Interval(10000, 10000)
             };
             CtIntervals = new Interval[Nfi];
             for (int i = 0; i < Nfi; i++)
@@ -142,7 +142,7 @@ namespace CP_ParallelPipesForm
 
         public int
             L = 24000, // длина труб
-            Nfi = 100; // кол-во ФИ трубы
+            Nfi = 49; // кол-во ФИ трубы
 
         public List<Pipe> Pipes = new List<Pipe>(); // трубы
         public Anod anod = new Anod(); // анод
@@ -159,10 +159,6 @@ namespace CP_ParallelPipesForm
         int slauSize; // размер блока уравнений для 1 трубы;
 
         LinearSystem resultSlau; // полученная матрица
-        Interval[][] iJt;
-        Interval[][] iUtpr;
-        Interval[][] iUtm;
-        Interval[][] iUtg;
         private Interval[][] UtprIntervals;
         private Interval[][] ItgIntervals;
 
@@ -216,7 +212,6 @@ namespace CP_ParallelPipesForm
             ItgIntervals = getItgIntervals(new Interval(Sigma_g, Sigma_g),
                 // new Interval(Sigma_g * (1 - Sgrad), Sigma_g * (1 + Sgrad)),
                 CtPipes);
-            // calcIntervals();
         }
 
         public Interval[][] getUtprIntervals(Interval SigmaG, Interval[][] Ct)
@@ -293,7 +288,7 @@ namespace CP_ParallelPipesForm
                 }
             }
 
-            for (int i = 0; i < Nfi; i++)
+            Parallel.For(0, Nfi, (i) =>
             {
                 double curSigma = SigmaG.x1;
                 double[][] curCt = new double[Pipes.Count][];
@@ -372,7 +367,7 @@ namespace CP_ParallelPipesForm
 
                     curSigma = SigmaG.x2;
                 }
-            }
+            });
 
             return Itg;
         }
@@ -499,34 +494,6 @@ namespace CP_ParallelPipesForm
             return (A, B);
         }
 
-        public void calcIntervals()
-        {
-            iJt = new Interval[Pipes.Count][];
-            iUtpr = new Interval[Pipes.Count][];
-            iUtm = new Interval[Pipes.Count][];
-            iUtg = new Interval[Pipes.Count][];
-            Interval iSgrunt = new Interval(Sigma_g * (1 - Sgrad), Sigma_g * (1 + Sgrad));
-            for (int i = 0; i < Pipes.Count; i++)
-            {
-                var pipe = Pipes[i];
-                Interval iCt = new Interval(pipe.Ct * (1 - pipe.Ctrad), pipe.Ct * (1 + pipe.Ctrad));
-                var Itg = getItg(i)[1];
-                var Utg = getUtg(i)[1];
-                iJt[i] = new Interval[Nfi];
-                iUtpr[i] = new Interval[Nfi];
-                iUtm[i] = new Interval[Nfi];
-                iUtg[i] = new Interval[Nfi];
-                for (int m = 0; m < Nfi; m++)
-                {
-                    var Jnt = Itg[m] / pipe.St;
-                    iJt[i][m] = (Jnt / pipe.Sigma_t) * iSgrunt;
-                    iUtpr[i][m] = iCt * iJt[i][m];
-                    iUtm[i][m] = Utg[m] - iUtpr[i][m];
-                    iUtg[i][m] = iUtm[i][m] + iUtpr[i][m];
-                }
-            }
-        }
-
         public int getStartCoordItkgY(int k)
         {
             int slauBlock =
@@ -566,11 +533,11 @@ namespace CP_ParallelPipesForm
         {
             double[] outResult = new double[size];
 
-            double Lt = (double) L / size;
+            double Lt = (double) L / (size - 1);
 
             for (int i = 1; i <= size; i++)
             {
-                outResult[i - 1] = (int) (Lt * i);
+                outResult[i - 1] = (int) (Lt * (i - 1));
             }
 
             return outResult;
@@ -646,17 +613,17 @@ namespace CP_ParallelPipesForm
             return (getX(size), ItgIntervals[k]);
         }
 
-        public (double[], Interval[]) getUtgInterval(int k)
-        {
-            int size = Nfi;
-            return (getX(size), iUtg[k]);
-        }
-
-        public (double[], Interval[]) getUtmInterval(int k)
-        {
-            int size = Nfi;
-            return (getX(size), iUtm[k]);
-        }
+        // public (double[], Interval[]) getUtgInterval(int k)
+        // {
+        //     int size = Nfi;
+        //     return (getX(size), iUtg[k]);
+        // }
+        //
+        // public (double[], Interval[]) getUtmInterval(int k)
+        // {
+        //     int size = Nfi;
+        //     return (getX(size), iUtm[k]);
+        // }
 
         public (double[], Interval[]) getUtprInterval(int k)
         {
@@ -759,36 +726,19 @@ namespace CP_ParallelPipesForm
 
         private void GaussForwardStroke(int[] index)
         {
-            // for (int i = 0; i < size; ++i)
-            // {
-            //     double r = FindR(i, index);
-            //     for (int j = 0; j < size; ++j)
-            //         a_matrix[i, j] /= r;
-            //     b_vector[i] /= r;
-            //     Parallel.For(i + 1, size, (k) =>
-            //     {
-            //         double p = a_matrix[k, index[i]];
-            //         for (int j = i; j < size; ++j)
-            //             a_matrix[k, index[j]] -= a_matrix[i, index[j]] * p;
-            //         b_vector[k] -= b_vector[i] * p;
-            //         a_matrix[k, index[i]] = 0.0;
-            //     });
-            // }
-
             for (int i = 0; i < size; ++i)
             {
                 double r = FindR(i, index);
                 for (int j = 0; j < size; ++j)
                     a_matrix[i, j] /= r;
                 b_vector[i] /= r;
-                for (int k = i + 1; k < size; ++k)
-                {
+                Parallel.For(i + 1, size, (k) => {
                     double p = a_matrix[k, index[i]];
                     for (int j = i; j < size; ++j)
                         a_matrix[k, index[j]] -= a_matrix[i, index[j]] * p;
                     b_vector[k] -= b_vector[i] * p;
                     a_matrix[k, index[i]] = 0.0;
-                }
+                });
             }
         }
 
@@ -796,13 +746,11 @@ namespace CP_ParallelPipesForm
         {
             for (int i = size - 1; i >= 0; --i)
             {
-                double x_i = b_vector[i];
-                for (int j = 0; j < i + 1; j++)
+                x_vector[index[i]] = b_vector[i];
+                for (int j = i + 1; j < size; ++j)
                 {
-                    x_i -= x_vector[index[j]] * a_matrix[i, index[j]];
+                    x_vector[index[i]] -= x_vector[index[j]] * a_matrix[i, index[j]];
                 }
-                // Parallel.For(i + 1, size, (j) => {  });
-                x_vector[index[i]] = x_i;
             }
         }
 
