@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
+using CP_ParallelPipesForm.Core;
 
 namespace CP_ParallelPipesForm
 {
@@ -16,11 +17,12 @@ namespace CP_ParallelPipesForm
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(ms, other);
                 ms.Position = 0;
-                return (T)formatter.Deserialize(ms);
+                return (T) formatter.Deserialize(ms);
             }
         }
 
         CP cp;
+
         public ResultForm(CP cp) : this()
         {
             if (cp.name != "")
@@ -30,10 +32,12 @@ namespace CP_ParallelPipesForm
 
             this.cp = cp;
             dateTimeLabel.Text = "Дата: " + cp.dateTime.ToString();
-            CalcTimeText.Text = "Загружено из файла"; //string.Format("Время вычисления: {0} мин. {1} сек. {2} мс.", calcTime.Minutes, calcTime.Seconds, calcTime.Milliseconds);
+            CalcTimeText.Text =
+                "Загружено из файла"; //string.Format("Время вычисления: {0} мин. {1} сек. {2} мс.", calcTime.Minutes, calcTime.Seconds, calcTime.Milliseconds);
 
             InitComboBoxes();
         }
+
         public ResultForm(string name, CP cp, TimeSpan calcTime) : this()
         {
             if (cp.name != "")
@@ -44,7 +48,8 @@ namespace CP_ParallelPipesForm
             this.cp = DeepCopy<CP>(cp);
 
             dateTimeLabel.Text = "Дата: " + cp.dateTime.ToString();
-            CalcTimeText.Text = string.Format("Время вычисления: {0} мин. {1} сек. {2} мс.", calcTime.Minutes, calcTime.Seconds, calcTime.Milliseconds);
+            CalcTimeText.Text = string.Format("Время вычисления: {0} мин. {1} сек. {2} мс.", calcTime.Minutes,
+                calcTime.Seconds, calcTime.Milliseconds);
 
             InitComboBoxes();
         }
@@ -52,12 +57,33 @@ namespace CP_ParallelPipesForm
         public ResultForm()
         {
             InitializeComponent();
-            UprButtonGraph.Click += (object sender, EventArgs e) => { graphicBtn_Click("Защитный потенциал,Upr, В", "Upr", cp.name, comboBoxUpr, cp.getUtpr); };
-            UtgButtonGraph.Click += (object sender, EventArgs e) => { graphicBtn_Click("Потенциал в грунте, Utg, В", "Utg", cp.name, comboBoxUtg, cp.getUtg); };
-            UtmButtonGraph.Click += (object sender, EventArgs e) => { graphicBtn_Click("Потенциал в металле, Utm, В", "Utm", cp.name, comboBoxUtm, cp.getUtm); };
-            ItgButtonGraph.Click += (object sender, EventArgs e) => { graphicBtn_Click("Ток, втекающий через боковую поверхность, Itg, А/м2", cp.name, "Itg", comboBoxItg, cp.getItg); };
-            ItxButtonGraph.Click += (object sender, EventArgs e) => { graphicBtn_Click("Продольный ток между соседними ФИ, Itx, А/м2", cp.name, "Itx", comboBoxItx, cp.getItx); };
-
+            UprButtonGraph.Click += (object sender, EventArgs e) =>
+            {
+                graphicBtn_Click("Защитный потенциал,Upr, В", "Upr", 
+                    cp.name, comboBoxUpr, cp.getUtpr, cp.getUtprInterval);
+            };
+            UtgButtonGraph.Click += (object sender, EventArgs e) =>
+            {
+                graphicBtn_Click("Потенциал в грунте, Utg, В", "Utg", cp.name, comboBoxUtg, cp.getUtg, cp.getUtgInterval);
+            };
+            UtmButtonGraph.Click += (object sender, EventArgs e) =>
+            {
+                graphicBtn_Click("Потенциал в металле, Utm, В", "Utm", cp.name, comboBoxUtm, cp.getUtm, cp.getUtmInterval);
+            };
+            ItgButtonGraph.Click += (object sender, EventArgs e) =>
+            {
+                graphicBtn_Click("Ток, втекающий через боковую поверхность, Itg, А/м2", cp.name, "Itg", comboBoxItg,
+                    cp.getItg, cp.getItgInterval);
+            };
+            ItxButtonGraph.Click += (object sender, EventArgs e) =>
+            {
+                graphicBtn_Click("Продольный ток между соседними ФИ, Itx, А/м2", cp.name, "Itx", comboBoxItx,
+                    cp.getItx);
+            };
+            JtxButtonGraph.Click += (object sender, EventArgs e) =>
+            {
+                graphicBtn_Click("Плотность тока \"грунт-труба\", Jtx, А/м2", cp.name, "Jtx", comboBoxItx, cp.getJt, cp.getJtInterval);
+            };
             SaveUtgButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getUtg, "Ut{0}g "); };
             SaveUtmButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getUtm, "Ut{0}m "); };
             SaveItgButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getItg, "It{0}g "); };
@@ -67,12 +93,13 @@ namespace CP_ParallelPipesForm
 
         void InitComboBoxes()
         {
-            string[] boxesNames = { "comboBoxUpr", "comboBoxUtg", "comboBoxUtm", "comboBoxItg", "comboBoxItx" };
+            string[] boxesNames = {"comboBoxUpr", "comboBoxUtg", "comboBoxUtm", "comboBoxItg", "comboBoxItx"};
             for (int i = 0; i < cp.Pipes.Count; i++)
             {
                 for (int j = 0; j < boxesNames.Length; j++)
                 {
-                    ComboBox box = (ComboBox)this.GetType().GetField(boxesNames[j], BindingFlags.Instance | BindingFlags.NonPublic).GetValue(this);
+                    ComboBox box = (ComboBox) this.GetType()
+                        .GetField(boxesNames[j], BindingFlags.Instance | BindingFlags.NonPublic).GetValue(this);
                     box.Items.Add("Все");
                     box.Items.Add(cp.Pipes[i].name);
                     box.SelectedIndex = 0;
@@ -80,22 +107,31 @@ namespace CP_ParallelPipesForm
             }
         }
 
-        private void graphicBtn_Click(string graphName, string name, string issledName, ComboBox comboBox, Func<int,double[][]> points)
+        private void graphicBtn_Click(string graphName, string name, string issledName, ComboBox comboBox,
+            Func<int, double[][]> points, Func<int, (double[] x, Interval[] y)> pointsInterval = null, bool useIntervals = true)
         {
-            GraphicForm gf = new GraphicForm(graphName,name, issledName);
+            GraphicForm gf = new GraphicForm(graphName, name, issledName);
             gf.Text = "График: " + graphName;
 
             if (comboBox.SelectedIndex == 0)
             {
                 for (int i = 0; i < cp.Pipes.Count; i++)
                 {
-                    double[][] pointss = points(i);
-                    gf.ShowChart(cp.Pipes[i].name, pointss[0], pointss[1]);
+                    if (useIntervals && pointsInterval != null)
+                    {
+                        gf.ShowChart(cp.Pipes[i].name, pointsInterval(i).x, pointsInterval(i).y);
+                    }
+                    else
+                    {
+                        gf.ShowChart(cp.Pipes[i].name, points(i)[0], points(i)[1]);
+                    }
                 }
-            } else
+            }
+            else
             {
-                double[][] pointss = points(comboBox.SelectedIndex-1);
-                gf.ShowChart(cp.Pipes[comboBox.SelectedIndex-1].name, comboBox.SelectedIndex - 1, pointss[0], pointss[1]);
+                double[][] pointss = points(comboBox.SelectedIndex - 1);
+                gf.ShowChart(cp.Pipes[comboBox.SelectedIndex - 1].name, comboBox.SelectedIndex - 1, pointss[0],
+                    pointss[1]);
             }
 
             gf.Show();
@@ -130,6 +166,7 @@ namespace CP_ParallelPipesForm
                         {
                             data += string.Format("{0,23}", cp.Pipes[j].name); // string.Format(pointsName, j + 1)
                         }
+
                         data += "\r\n";
                     }
 
@@ -140,14 +177,14 @@ namespace CP_ParallelPipesForm
                             data += string.Format("{0,23}", allPoints[j][0][i].ToString("E8"));
                         }
 
-                       data += string.Format("{0,23}", allPoints[j][1][i].ToString("E8"));
+                        data += string.Format("{0,23}", allPoints[j][1][i].ToString("E8"));
                     }
+
                     data += "\r\n";
                 }
 
                 File.WriteAllText(saveFileDialog.FileName, data);
             }
-
         }
 
         void ShowOrigParamsButtonClick(object s, EventArgs e)
@@ -183,25 +220,25 @@ namespace CP_ParallelPipesForm
             };
 
             string[] pipeFields = new string[]
-                {
-                    "Глубина от уровня земли до верхней т.Т, м.",
-                    "Расстояние до анода по горизонтали, м",
-                    "Удельное сопротивление, Ом*м",
-                    "Внешний диаметр, м",
-                    "Толщина стенки, м",
-                    "Сопротивление изоляции, Ом*м2",
-                    "-----Результаты вычислений-----",
-                    "Площадь сеч металла",
-                    "Продольное сопротивление трубы, Ом/м",
-                    "Сопротивление изоляции трубы, Ом*м",
-                    "Удельная электропроводность металла трубы",
-                    "Площади боковых поверхностей",
-                    "Сопротивление по нормали КОЭ трубы"
+            {
+                "Глубина от уровня земли до верхней т.Т, м.",
+                "Расстояние до анода по горизонтали, м",
+                "Удельное сопротивление, Ом*м",
+                "Внешний диаметр, м",
+                "Толщина стенки, м",
+                "Сопротивление изоляции, Ом*м2",
+                "-----Результаты вычислений-----",
+                "Площадь сеч металла",
+                "Продольное сопротивление трубы, Ом/м",
+                "Сопротивление изоляции трубы, Ом*м",
+                "Удельная электропроводность металла трубы",
+                "Площади боковых поверхностей",
+                "Сопротивление по нормали КОЭ трубы"
             };
 
             string[][] fields = new string[2][];
-            fields[0] = new string[otherFields.Length + cp.Pipes.Count * (pipeFields.Length+1)];
-            fields[1] = new string[otherFields.Length + cp.Pipes.Count * (pipeFields.Length+1)];
+            fields[0] = new string[otherFields.Length + cp.Pipes.Count * (pipeFields.Length + 1)];
+            fields[1] = new string[otherFields.Length + cp.Pipes.Count * (pipeFields.Length + 1)];
 
             for (int i = 0; i < otherFields.Length; i++)
             {
@@ -211,7 +248,8 @@ namespace CP_ParallelPipesForm
 
             for (int i = 0; i < cp.Pipes.Count; i++)
             {
-                fields[0][otherFields.Length + (pipeFields.Length + 1) * i] = "-----------------------------" + cp.Pipes[i].name.ToUpper();
+                fields[0][otherFields.Length + (pipeFields.Length + 1) * i] =
+                    "-----------------------------" + cp.Pipes[i].name.ToUpper();
                 string[] pipeValuesFields = new string[]
                 {
                     cp.Pipes[i].Ht.ToString(),
@@ -226,30 +264,28 @@ namespace CP_ParallelPipesForm
                     cp.Pipes[i].Rct.ToString("E3"),
                     cp.Pipes[i].Sigma_t.ToString("E3"),
                     cp.Pipes[i].St.ToString("E3"),
-                    (cp.Pipes[i].Ct/cp.Pipes[i].St).ToString("E3"),
+                    (cp.Pipes[i].Ct / cp.Pipes[i].St).ToString("E3"),
                 };
 
                 for (int j = 0; j < pipeFields.Length; j++)
                 {
-
-                    fields[0][otherFields.Length + (pipeFields.Length+1) * i + j+1] = pipeFields[j];
-                    fields[1][otherFields.Length + (pipeFields.Length+1) * i + j+1] = pipeValuesFields[j];
+                    fields[0][otherFields.Length + (pipeFields.Length + 1) * i + j + 1] = pipeFields[j];
+                    fields[1][otherFields.Length + (pipeFields.Length + 1) * i + j + 1] = pipeValuesFields[j];
                 }
-
             }
 
             for (int i = 0; i < fields[0].Length; i++)
             {
                 Label lb = new Label();
-                lb.Location = new System.Drawing.Point(25, 25 + i*25);
+                lb.Location = new System.Drawing.Point(25, 25 + i * 25);
                 lb.Text = fields[0][i];
                 lb.Size = new System.Drawing.Size(250, 25);
                 otherParamsForm.Controls.Add(lb);
 
                 Label lbValue = new Label();
-                lbValue.Location = new System.Drawing.Point(275, 25 + i*25);
+                lbValue.Location = new System.Drawing.Point(275, 25 + i * 25);
                 lbValue.Size = new System.Drawing.Size(100, 25);
-                lbValue.Text = string.Format("{0,20}",fields[1][i]);
+                lbValue.Text = string.Format("{0,20}", fields[1][i]);
                 otherParamsForm.Controls.Add(lbValue);
             }
 
@@ -265,7 +301,7 @@ namespace CP_ParallelPipesForm
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                Stream stream =  ofd.OpenFile();
+                Stream stream = ofd.OpenFile();
                 BinaryFormatter bf = new BinaryFormatter();
 
                 CP cp = bf.Deserialize(stream) as CP;
@@ -294,7 +330,6 @@ namespace CP_ParallelPipesForm
 
         private void SaveOrigButton_Click(object sender, EventArgs e)
         {
-
         }
     }
 }

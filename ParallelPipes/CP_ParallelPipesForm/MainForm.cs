@@ -61,7 +61,18 @@ namespace CP_ParallelPipesForm
             {
                 CalcMessage.Visible = true;
                 CalcMessage.Text = "Вычисляю, пожалуйста, подождите...";
-                backgroundWorker1.RunWorkerAsync();
+                // backgroundWorker1.RunWorkerAsync();
+                
+                stopWatch = new Stopwatch();
+                stopWatch.Start();//начинаем отчет времени
+
+                cp.Solve();
+
+                stopWatch.Stop();//останавливаем отсчет
+                TimeSpan ts = stopWatch.Elapsed;
+                ResultForm rs = new ResultForm(NameVar.Text, cp, ts);
+                rs.Show();
+                CalcMessage.Visible = false;
 
             }
         }

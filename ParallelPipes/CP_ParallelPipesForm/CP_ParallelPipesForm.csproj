@@ -80,6 +80,8 @@
     <Compile Include="GraphicForm.Designer.cs">
       <DependentUpon>GraphicForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interpolation.cs" />
+    <Compile Include="Interval.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

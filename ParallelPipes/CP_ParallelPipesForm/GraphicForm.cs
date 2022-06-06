@@ -4,6 +4,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 using System.Drawing;
 using System.Collections.Generic;
 using System.IO;
+using CP_ParallelPipesForm.Core;
 
 namespace CP_ParallelPipesForm
 {
@@ -68,6 +69,22 @@ namespace CP_ParallelPipesForm
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        public void ShowChart(string chartName, double[] x, Interval[] y)
+        {
+            var y1 = new double[y.Length];
+            var y2 = new double[y.Length];
+            var yMid = new double[y.Length];
+            for (int i = 0; i < y.Length; i++)
+            {
+                y1[i] = y[i].x1;
+                y2[i] = y[i].x2;
+                yMid[i] = y[i].Mid();
+            }
+            ShowChart(chartName + "Нач", x, y1);
+            ShowChart(chartName + "Ср", x, yMid);
+            ShowChart(chartName + "Кон", x, y2);
         }
 
         private void SaveGraphButton_Click(object sender, EventArgs e)
