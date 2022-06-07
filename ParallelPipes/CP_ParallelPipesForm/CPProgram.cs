@@ -170,8 +170,8 @@ namespace CP_ParallelPipesForm
         {
             dateTime = DateTime.Now;
             Sigma_g = 1 / ro_g;
-            slauSize = 5 * Nfi * Pipes.Count - Pipes.Count;
-            slauBlockTSize = 5 * Nfi - 1;
+            slauSize = 5 * Nfi * Pipes.Count;
+            slauBlockTSize = 5 * Nfi;
 
             anod.Init(L); // инициализация анода
 
@@ -202,15 +202,23 @@ namespace CP_ParallelPipesForm
         public void Solve()
         {
             Init();
-            // var (A, B) = getSlau(Sigma_g, Pipes[0].Ct);
-            // resultSlau = new LinearSystem(A, B);
+            double[][] CtMid = new double[Nfi][];
+            for (int m = 0; m < Pipes.Count; m++)
+            {
+                CtMid[m] = new double[Nfi];
+                for (int i = 0; i < Nfi; i++)
+                {
+                    CtMid[m][i] = Pipes[m].iCt[i].Mid();
+                }
+            }
+            var SigmaGr = 1d / iRoG;
+            var (A, B) = getSlau(SigmaGr.Mid(), CtMid);
+            resultSlau = new LinearSystem(A, B);
             Interval[][] CtPipes = new Interval[Pipes.Count][];
             for (int i = 0; i < CtPipes.Length; i++)
             {
                 CtPipes[i] = Pipes[i].iCt;
             }
-
-            var SigmaGr = 1d / iRoG;
             UtprIntervals = getUtprIntervals(SigmaGr, CtPipes);
             ItgIntervals = getItgIntervals(SigmaGr, CtPipes);
         }
@@ -373,7 +381,6 @@ namespace CP_ParallelPipesForm
             return Itg;
         }
 
-
         public (double[,], double[]) getSlau(double SigmaG, double[][] Ct)
         {
             double[,] A = new double[slauSize, slauSize]; // матрица с коэффицентами системы уравенний
@@ -386,17 +393,19 @@ namespace CP_ParallelPipesForm
                 int slauBlock =
                     slauBlockTSize * k - 1; // начальная координата блока уравений по вертикали для трубы с номером k
 
-                int ItkgY = slauBlock; // нач. коорд. блока уравнений Itkg
-                int ItkxY = slauBlock + Nfi; // нач. коорд. блока уравнений Itkx
-                int UtkgY = slauBlock + 2 * Nfi - 1; // нач. коорд. блока уравнений Utkg
-                int UtkmY = slauBlock + 3 * Nfi - 1; // нач. коорд. блока уравнений Utkm
-                int Utpr = slauBlock + 4 * Nfi - 1; // нач. коорд. блока уравнений Utpr
+                int ItkgY = getStartCoordItkgY(k); // нач. коорд. блока уравнений Itkg
+                int ItkxY = getStartCoordItkxY(k); // нач. коорд. блока уравнений Itkx
+                int UtkgY = getStartCoordUtkgY(k); // нач. коорд. блока уравнений Utkg
+                int UtkmY = getStartCoordUtkmY(k); // нач. коорд. блока уравнений Utkm
+                int Utpr = getStartCoordUtpr(k); // нач. коорд. блока уравнений Utpr
+                int Is = getStartCoordIs(k); // нач. коорд. блока уравнений Is
 
                 int slau1X = slauBlock; // нач. коорд. блока уравнений по X
                 int slau2X = slauBlock + Nfi; // нач. коорд. блока уравнений по X
                 int slau3X = slauBlock + 2 * Nfi; // нач. коорд. блока уравнений по X
                 int slau4X = slauBlock + 3 * Nfi - 1; // нач. коорд. блока уравнений по X
                 int slau5X = slauBlock + 4 * Nfi - 1; // нач. коорд. блока уравнений по X
+                int slau6X = slauBlock + 5 * Nfi; // нач. коорд. блока уравнений по X
 
                 //++++++++++++++++++ 1 блок уравнений ++++++++++++++++++++++
                 //Законы Киргофа для ФИ по трубе
@@ -417,8 +426,7 @@ namespace CP_ParallelPipesForm
                 A[slau1X + isk, ItkgY + isk] = 1; //Itkg,isk
                 A[slau1X + isk, ItkxY + isk - 1] = 1; //Itkx,isk-1
                 A[slau1X + isk, ItkxY + isk] = 1; //Itkx,isk
-
-                B[slau1X + isk] = Pipes[k].Its;
+                A[slau1X + isk, Is] = -1;
 
                 //---------------при i=isk+1,…,N-1------------------------
                 for (int i = isk + 1; i <= Nfi - 1; i++)
@@ -431,6 +439,16 @@ namespace CP_ParallelPipesForm
                 //---------------при i=N-----------------------------------
                 A[slau1X + Nfi, ItkgY + Nfi] = 1; //Itkg,N
                 A[slau1X + Nfi, ItkxY + Nfi - 1] = -1; //Itkx,N-1
+
+                // Сумма токов в точке дренажа
+                if (k == 0)
+                {
+                    for (int i = 0; i < Pipes.Count; i++)
+                    {
+                        A[slau6X, getStartCoordIs(i)] = 1;
+                    }
+                    B[slau6X] = anod.I0;
+                }
 
                 //++++++++++++++++++ 2 блок уравнений ++++++++++++++++++++++
                 //Граничные условия 3 рода
@@ -490,6 +508,16 @@ namespace CP_ParallelPipesForm
                     A[slau5X + i, UtkgY + i] = -1; //Utkg,i
                     A[slau5X + i, UtkmY + i] = 1; //Utkm,i
                 }
+
+                //++++++++++++++++++ 6 блок уравнений ++++++++++++++++++++++
+                // 2 закон кирхгорфа в точках подключения к катодной станции
+                if (k > 0)
+                {
+                    A[slau6X, UtkmY + isk] = 1;
+                    A[slau6X, UtkgY + isk] = 1;
+                    A[slau6X, getStartCoordUtkmY(k - 1) + isk] = -1;
+                    A[slau6X, getStartCoordUtkgY(k - 1) + isk] = -1;
+                }
             }
 
             return (A, B);
@@ -530,6 +558,12 @@ namespace CP_ParallelPipesForm
             return slauBlock + 4 * Nfi - 1;
         }
 
+        public int getStartCoordIs(int k)
+        {
+            int slauBlock = slauBlockTSize * k - 1; // начальная координата блока уравений по вертикали для трубы с номером k
+            return slauBlock + 5 * Nfi;
+        }
+
         public double[] getX(int size)
         {
             double[] outResult = new double[size];
@@ -557,7 +591,7 @@ namespace CP_ParallelPipesForm
         public double[][] getItx(int k)
         {
             int startCoord = getStartCoordItkxY(k);
-            int size = Nfi;
+            int size = Nfi - 1;
 
             double[][] XY = new double[2][];
             XY[0] = getX(size);
