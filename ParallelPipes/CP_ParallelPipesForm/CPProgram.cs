@@ -48,12 +48,9 @@ namespace CP_ParallelPipesForm
         public double Rt0 { get; private set; } // Внутр радиус Т
         public double SechT { get; private set; } // Площадь сеч металла Т
         public double RproT { get; private set; } // продольное сопротивление трубы, Ом/м
-        public double RproT1 { get; private set; } // продольное сопротивление трубы на единицу длины, Ом*м
         public double Sigma_t { get; private set; } // Удельная электропроводность металла трубы
         public double Lfi { get; private set; } // длина одной части ФИ трубы
         public double St { get; private set; } // площади боковых поверхностей
-        public double Zt { get; private set; } //входное сопротивление трубопровода, Ом
-        public double Its; // Ток, втекающий в точку дренажа 
         public Vector3[] FIs; // координаты ФИ
 
         // ======================== ИЗОЛЯЦИЯ ТРУБЫ ========================
@@ -61,9 +58,7 @@ namespace CP_ParallelPipesForm
         public double[] CtX;
         public Interval[] CtIntervals;
         public Interval[] iCt;
-        public double Ctrad = 0.05;
         public double Rct { get; private set; } // сопротивление изоляции трубы, Ом*м
-        public double Rct1 { get; private set; } // сопротивление изоляции на единицу длины, Ом*м
 
         public Pipe()
         {
@@ -80,17 +75,14 @@ namespace CP_ParallelPipesForm
             St = Math.PI * 2 * Rt2 * Lfi;
             Sigma_t = 1d / ro_t;
             Rct = Ct / St;
-            Rct1 = Ct / (Math.PI * Dt2);
-            RproT1 = ro_t / (Math.PI * (Dt2 - Det) * Det);
-
-            Zt = Math.Sqrt(Rct1 * RproT1) / 2d;
 
             FIs = new Vector3[Nfi];
 
             for (int i = 0; i < Nfi; i++)
             {
-                FIs[i] = new Vector3((i * Lfi + Lfi / 2), Lta, (Ht + Rt2));
+                FIs[i] = new Vector3((i * Lfi + Lfi / 2), Lta, -(Ht + Rt2));
             }
+
             iCt = new Interval[Nfi];
             if (CtIntervals == null)
             {
@@ -104,6 +96,7 @@ namespace CP_ParallelPipesForm
                     new Interval(Ct, Ct)
                 };
             }
+
             for (int i = 0; i < Nfi; i++)
             {
                 iCt[i] = Interpolation.LinearInterpolation((double) i * L / (Nfi - 1), CtX, CtIntervals);
@@ -134,7 +127,7 @@ namespace CP_ParallelPipesForm
 
         public void Init(int L)
         {
-            pos = new Vector3(L / 2, 0, Za);
+            pos = new Vector3(L / 2, 0, -Za);
         }
     }
 
@@ -148,9 +141,10 @@ namespace CP_ParallelPipesForm
             L = 24000, // длина труб
             Nfi = 49; // кол-во ФИ трубы
 
+        private double MaxLta; // Расстоние до самой удалененной точки трубы
+
         public List<Pipe> Pipes = new List<Pipe>(); // трубы
         public Anod anod = new Anod(); // анод
-        public double Z0 { get; private set; } // общее входное сопротивление, Ом
 
         // ======================== ГРУНТ =================================
         public double ro_g = 500; // Уд сопр грунта, Ом*м: 5..10000
@@ -174,24 +168,13 @@ namespace CP_ParallelPipesForm
             slauBlockTSize = 5 * Nfi;
 
             anod.Init(L); // инициализация анода
-
             for (int i = 0; i < Pipes.Count; i++)
             {
                 Pipes[i].Init(L, Nfi); // инциализация и рассчет параметров трубы
-            }
-
-            Z0 = 0;
-
-            for (int i = 0; i < Pipes.Count; i++)
-            {
-                Z0 += 1d / Pipes[i].Zt;
-            }
-
-            Z0 = 1d / Z0;
-
-            for (int i = 0; i < Pipes.Count; i++)
-            {
-                Pipes[i].Its = (anod.I0 * Z0) / Pipes[i].Zt;
+                if (Pipes[i].Lta + Pipes[i].Rt2 > MaxLta)
+                {
+                    MaxLta = Pipes[i].Lta + Pipes[i].Rt2;
+                }
             }
         }
 
@@ -490,14 +473,14 @@ namespace CP_ParallelPipesForm
                     {
                         for (int j = 1; j <= Nfi; j++)
                         {
-                            double distance = Pipes[k].getDistanceBetweenPoint(i - 1, Pipes[l].FIs[j - 1]);
-
-                            if (distance > 1e-16)
-                                A[slau4X + i, slauBlockTSize * l - 1 + i] += 1d / distance;
+                            if (k != l || i != j)
+                            {
+                                A[slau4X + i, getStartCoordItkgY(k) + i] += MirrorReflectionDistance(Pipes[k].FIs[i - 1], Pipes[l].FIs[j - 1]);
+                            }
                         }
                     }
 
-                    B[slau4X + i] = anod.I0 / Pipes[k].getDistanceBetweenPoint(i - 1, anod.pos);
+                    B[slau4X + i] = anod.I0 * MirrorReflectionDistance(anod.pos, Pipes[k].FIs[i - 1]);
                 }
 
                 //++++++++++++++++++ 5 блок уравнений ++++++++++++++++++++++
@@ -510,7 +493,7 @@ namespace CP_ParallelPipesForm
                 }
 
                 //++++++++++++++++++ 6 блок уравнений ++++++++++++++++++++++
-                // 2 закон кирхгорфа в точках подключения к катодной станции
+                // 2 закон Кирхгорфа в точках подключения к катодной станции
                 if (k > 0)
                 {
                     A[slau6X, UtkmY + isk] = 1;
@@ -521,6 +504,41 @@ namespace CP_ParallelPipesForm
             }
 
             return (A, B);
+        }
+
+        double MirrorReflectionDistance(Vector3 p1, Vector3 p2)
+        {
+            Vector3[] reflectFis = new Vector3[12];
+            // Исходный ФИ
+            reflectFis[0] = new Vector3(p2.x, p2.y, p2.z);
+            // ФИ зерк от-но x=0
+            reflectFis[1] = new Vector3(-p2.x, p2.y, p2.z);
+            // ФИ зерк от-но y=0
+            reflectFis[2] = new Vector3(p2.x,  2 * MaxLta - p2.y, p2.z);
+            // ФИ зерк от-но z=0
+            reflectFis[3] = new Vector3(p2.x, p2.y, -p2.z);
+            // ФИ зерк от-но x=0 z=0
+            reflectFis[4] = new Vector3(-p2.x, p2.y, -p2.z);
+            // ФИ зерк от-но x=0 y=0
+            reflectFis[5] = new Vector3(-p2.x, 2 * MaxLta - p2.y, p2.z);
+            // ФИ зерк от-но y=0 z=0
+            reflectFis[6] = new Vector3(p2.x,2 * MaxLta - p2.y, -p2.z);
+            // ФИ зерк от-но x=L
+            reflectFis[7] = new Vector3(2 * L - p2.x, p2.y, p2.z);
+            // ФИ зерк от-но x=L y=0
+            reflectFis[8] = new Vector3(2 * L - p2.x, 2 * MaxLta - p2.y, p2.z);
+            // ФИ зерк от-но x=L z=0
+            reflectFis[9] = new Vector3(2 * L - p2.x, p2.y, -p2.z);
+            // ФИ зерк от-но x=0 y=0 z=0
+            reflectFis[10] = new Vector3(-p2.x, 2 * MaxLta - p2.y, -p2.z);
+            // ФИ зерк от-но x=L y=0 z=0
+            reflectFis[11] = new Vector3(2 * L - p2.x, 2 * MaxLta - p2.y, -p2.z);
+            double sum = 0;
+            foreach (var point in reflectFis)
+            {
+                sum += 1d / Vector3.Distance(p1, point);
+            }
+            return sum;
         }
 
         public int getStartCoordItkgY(int k)
@@ -560,7 +578,8 @@ namespace CP_ParallelPipesForm
 
         public int getStartCoordIs(int k)
         {
-            int slauBlock = slauBlockTSize * k - 1; // начальная координата блока уравений по вертикали для трубы с номером k
+            int slauBlock =
+                slauBlockTSize * k - 1; // начальная координата блока уравений по вертикали для трубы с номером k
             return slauBlock + 5 * Nfi;
         }
 
@@ -767,7 +786,8 @@ namespace CP_ParallelPipesForm
                 for (int j = 0; j < size; ++j)
                     a_matrix[i, j] /= r;
                 b_vector[i] /= r;
-                Parallel.For(i + 1, size, (k) => {
+                Parallel.For(i + 1, size, (k) =>
+                {
                     double p = a_matrix[k, index[i]];
                     for (int j = i; j < size; ++j)
                         a_matrix[k, index[j]] -= a_matrix[i, index[j]] * p;
