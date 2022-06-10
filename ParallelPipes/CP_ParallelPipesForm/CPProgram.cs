@@ -505,38 +505,24 @@ namespace CP_ParallelPipesForm
 
             return (A, B);
         }
-
+        // Учет зеркальных ФИ
         double MirrorReflectionDistance(Vector3 p1, Vector3 p2)
         {
-            Vector3[] reflectFis = new Vector3[12];
-            // Исходный ФИ
-            reflectFis[0] = new Vector3(p2.x, p2.y, p2.z);
-            // ФИ зерк от-но x=0
-            reflectFis[1] = new Vector3(-p2.x, p2.y, p2.z);
-            // ФИ зерк от-но y=0
-            reflectFis[2] = new Vector3(p2.x,  2 * MaxLta - p2.y, p2.z);
+            // ФИ зерк от-но x=0, x=L
+            double[] xVariants = new double[3] {p2.x, -p2.x, 2 * L - p2.x};
+            double[] yVariants = new double[1] {p2.y}; // 2 * MaxLta - p2.y
             // ФИ зерк от-но z=0
-            reflectFis[3] = new Vector3(p2.x, p2.y, -p2.z);
-            // ФИ зерк от-но x=0 z=0
-            reflectFis[4] = new Vector3(-p2.x, p2.y, -p2.z);
-            // ФИ зерк от-но x=0 y=0
-            reflectFis[5] = new Vector3(-p2.x, 2 * MaxLta - p2.y, p2.z);
-            // ФИ зерк от-но y=0 z=0
-            reflectFis[6] = new Vector3(p2.x,2 * MaxLta - p2.y, -p2.z);
-            // ФИ зерк от-но x=L
-            reflectFis[7] = new Vector3(2 * L - p2.x, p2.y, p2.z);
-            // ФИ зерк от-но x=L y=0
-            reflectFis[8] = new Vector3(2 * L - p2.x, 2 * MaxLta - p2.y, p2.z);
-            // ФИ зерк от-но x=L z=0
-            reflectFis[9] = new Vector3(2 * L - p2.x, p2.y, -p2.z);
-            // ФИ зерк от-но x=0 y=0 z=0
-            reflectFis[10] = new Vector3(-p2.x, 2 * MaxLta - p2.y, -p2.z);
-            // ФИ зерк от-но x=L y=0 z=0
-            reflectFis[11] = new Vector3(2 * L - p2.x, 2 * MaxLta - p2.y, -p2.z);
+            double[] zVariants = new double[2] {p2.z, -p2.z};
             double sum = 0;
-            foreach (var point in reflectFis)
+            for (int xi = 0; xi < xVariants.Length; xi++)
             {
-                sum += 1d / Vector3.Distance(p1, point);
+                for (int yi = 0; yi < yVariants.Length; yi++)
+                {
+                    for (int zi = 0; zi < zVariants.Length; zi++)
+                    {
+                        sum += 1d / Vector3.Distance(p1, new Vector3(xVariants[xi], yVariants[yi], zVariants[zi]));
+                    }
+                }
             }
             return sum;
         }
