@@ -35,6 +35,7 @@
             this.label10 = new System.Windows.Forms.Label();
             this.I0Text = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.ro_gText1 = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
             this.ro_gText = new System.Windows.Forms.TextBox();
             this.CalcButton = new System.Windows.Forms.Button();
@@ -55,21 +56,12 @@
             this.AboutMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label2 = new System.Windows.Forms.Label();
             this.VersionLabel = new System.Windows.Forms.Label();
-            this.ro_gText1 = new System.Windows.Forms.TextBox();
+            this.useIntervals = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // ro_gText1
-            // 
-            this.ro_gText1.Location = new System.Drawing.Point(471, 33);
-            this.ro_gText1.Margin = new System.Windows.Forms.Padding(4);
-            this.ro_gText1.Name = "ro_gText1";
-            this.ro_gText1.Size = new System.Drawing.Size(86, 22);
-            this.ro_gText1.TabIndex = 7;
-            this.ro_gText1.Text = "10000";
             // 
             // PipesGropup
             // 
@@ -137,7 +129,7 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(ro_gText1);
+            this.groupBox2.Controls.Add(this.ro_gText1);
             this.groupBox2.Controls.Add(this.label13);
             this.groupBox2.Controls.Add(this.ro_gText);
             this.groupBox2.Location = new System.Drawing.Point(16, 192);
@@ -148,6 +140,15 @@
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Грунт";
+            // 
+            // ro_gText1
+            // 
+            this.ro_gText1.Location = new System.Drawing.Point(471, 33);
+            this.ro_gText1.Margin = new System.Windows.Forms.Padding(4);
+            this.ro_gText1.Name = "ro_gText1";
+            this.ro_gText1.Size = new System.Drawing.Size(86, 22);
+            this.ro_gText1.TabIndex = 7;
+            this.ro_gText1.Text = "10000";
             // 
             // label13
             // 
@@ -345,11 +346,21 @@
             this.VersionLabel.TabIndex = 20;
             this.VersionLabel.Text = "Версия программы: 0.2";
             // 
+            // useIntervals
+            // 
+            this.useIntervals.Location = new System.Drawing.Point(16, 444);
+            this.useIntervals.Name = "useIntervals";
+            this.useIntervals.Size = new System.Drawing.Size(290, 24);
+            this.useIntervals.TabIndex = 21;
+            this.useIntervals.Text = "Интервальная неопределенность";
+            this.useIntervals.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1201, 549);
+            this.Controls.Add(this.useIntervals);
             this.Controls.Add(this.VersionLabel);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -378,6 +389,8 @@
             this.ResumeLayout(false);
             this.PerformLayout();
         }
+
+        private System.Windows.Forms.CheckBox useIntervals;
 
         #endregion
         private System.Windows.Forms.GroupBox PipesGropup;

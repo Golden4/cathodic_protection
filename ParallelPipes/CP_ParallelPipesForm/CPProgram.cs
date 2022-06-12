@@ -22,11 +22,17 @@ namespace CP_ParallelPipesForm
 
         public static double Distance(Vector3 vec1, Vector3 vec2)
         {
-            double x1 = (vec1.x - vec2.x) * (vec1.x - vec2.x);
-            double y1 = (vec1.y - vec2.y) * (vec1.y - vec2.y);
-            double z1 = (vec1.z - vec2.z) * (vec1.z - vec2.z);
-
-            return Math.Sqrt(x1 + y1 + z1);
+            var vecDiffX = (vec1.x - vec2.x);
+            var vecDiffY = (vec1.y - vec2.y);
+            var vecDiffZ = (vec1.z - vec2.z);
+            double x1 = vecDiffX * vecDiffX;
+            double y1 = vecDiffY * vecDiffY;
+            double z1 = vecDiffZ * vecDiffZ;
+            vecDiffX = 0;
+            vecDiffY = 0;
+            vecDiffZ = 0;
+            double dist = Math.Sqrt(x1 + y1 + z1);
+            return dist;
         }
     }
 
@@ -136,6 +142,7 @@ namespace CP_ParallelPipesForm
     {
         public string name;
         public DateTime dateTime;
+        public bool useIntervals;
 
         public int
             L = 24000, // длина труб
@@ -197,13 +204,17 @@ namespace CP_ParallelPipesForm
             var SigmaGr = 1d / iRoG;
             var (A, B) = getSlau(SigmaGr.Mid(), CtMid);
             resultSlau = new LinearSystem(A, B);
-            Interval[][] CtPipes = new Interval[Pipes.Count][];
-            for (int i = 0; i < CtPipes.Length; i++)
+            if (useIntervals)
             {
-                CtPipes[i] = Pipes[i].iCt;
+                Interval[][] CtPipes = new Interval[Pipes.Count][];
+                for (int i = 0; i < CtPipes.Length; i++)
+                {
+                    CtPipes[i] = Pipes[i].iCt;
+                }
+
+                UtprIntervals = getUtprIntervals(SigmaGr, CtPipes);
+                ItgIntervals = getItgIntervals(SigmaGr, CtPipes);
             }
-            UtprIntervals = getUtprIntervals(SigmaGr, CtPipes);
-            ItgIntervals = getItgIntervals(SigmaGr, CtPipes);
         }
 
         public Interval[][] getUtprIntervals(Interval SigmaG, Interval[][] Ct)
@@ -301,6 +312,8 @@ namespace CP_ParallelPipesForm
                 {
                     var (A, B) = getSlau(curSigma, curCt);
                     var linearSystem = new LinearSystem(A, B);
+                    A = null;
+                    B = null;
                     for (int p = 0; p < Pipes.Count; p++)
                     {
                         var rsItg = linearSystem.getSlauResult(getStartCoordItkgY(p), Nfi);
@@ -381,7 +394,7 @@ namespace CP_ParallelPipesForm
                 int UtkgY = getStartCoordUtkgY(k); // нач. коорд. блока уравнений Utkg
                 int UtkmY = getStartCoordUtkmY(k); // нач. коорд. блока уравнений Utkm
                 int Utpr = getStartCoordUtpr(k); // нач. коорд. блока уравнений Utpr
-                int Is = getStartCoordIs(k); // нач. коорд. блока уравнений Is
+                int Is = getStartCoordIts(k); // нач. коорд. блока уравнений Is
 
                 int slau1X = slauBlock; // нач. коорд. блока уравнений по X
                 int slau2X = slauBlock + Nfi; // нач. коорд. блока уравнений по X
@@ -428,7 +441,7 @@ namespace CP_ParallelPipesForm
                 {
                     for (int i = 0; i < Pipes.Count; i++)
                     {
-                        A[slau6X, getStartCoordIs(i)] = 1;
+                        A[slau6X, getStartCoordIts(i)] = 1;
                     }
                     B[slau6X] = anod.I0;
                 }
@@ -475,12 +488,14 @@ namespace CP_ParallelPipesForm
                         {
                             if (k != l || i != j)
                             {
-                                A[slau4X + i, getStartCoordItkgY(k) + i] += MirrorReflectionDistance(Pipes[k].FIs[i - 1], Pipes[l].FIs[j - 1]);
+                                var dist = MirrorReflectionDistance(Pipes[k].FIs[i - 1], Pipes[l].FIs[j - 1]);
+                                A[slau4X + i, getStartCoordItkgY(k) + i] += dist;
                             }
                         }
                     }
 
-                    B[slau4X + i] = anod.I0 * MirrorReflectionDistance(anod.pos, Pipes[k].FIs[i - 1]);
+                    var distA = MirrorReflectionDistance(anod.pos, Pipes[k].FIs[i - 1]);
+                    B[slau4X + i] = anod.I0 * distA;
                 }
 
                 //++++++++++++++++++ 5 блок уравнений ++++++++++++++++++++++
@@ -520,7 +535,12 @@ namespace CP_ParallelPipesForm
                 {
                     for (int zi = 0; zi < zVariants.Length; zi++)
                     {
-                        sum += 1d / Vector3.Distance(p1, new Vector3(xVariants[xi], yVariants[yi], zVariants[zi]));
+                        var x = xVariants[xi];
+                        var y = yVariants[yi];
+                        var z = zVariants[zi];
+                        Vector3 vec3 = new Vector3(x, y, z);
+                        double dist = Vector3.Distance(p1, vec3);
+                        sum += 1d / dist;
                     }
                 }
             }
@@ -562,7 +582,7 @@ namespace CP_ParallelPipesForm
             return slauBlock + 4 * Nfi - 1;
         }
 
-        public int getStartCoordIs(int k)
+        public int getStartCoordIts(int k)
         {
             int slauBlock =
                 slauBlockTSize * k - 1; // начальная координата блока уравений по вертикали для трубы с номером k
@@ -653,6 +673,12 @@ namespace CP_ParallelPipesForm
             return (getX(size), ItgIntervals[k]);
         }
 
+        public double getIts(int k)
+        {
+            var its = resultSlau.XVector[getStartCoordIts(k)];
+            return its;
+        }
+
         // public (double[], Interval[]) getUtgInterval(int k)
         // {
         //     int size = Nfi;
@@ -710,6 +736,8 @@ namespace CP_ParallelPipesForm
             this.size = b_length;
             this.eps = eps;
             GaussSolve();
+            this.a_matrix = null;
+            this.b_vector = null;
         }
 
         public double[] XVector

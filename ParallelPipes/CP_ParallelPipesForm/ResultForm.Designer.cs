@@ -54,7 +54,7 @@
             this.comboBoxItx = new System.Windows.Forms.ComboBox();
             this.comboBoxItg = new System.Windows.Forms.ComboBox();
             this.SaveOrigButton = new System.Windows.Forms.Button();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.comboBoxJtg = new System.Windows.Forms.ComboBox();
             this.button1 = new System.Windows.Forms.Button();
             this.JtxButtonGraph = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
@@ -325,15 +325,15 @@
             this.SaveOrigButton.UseVisualStyleBackColor = true;
             this.SaveOrigButton.Click += new System.EventHandler(this.SaveOrigButton_Click);
             // 
-            // comboBox1
+            // comboBoxJtg
             // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(620, 367);
-            this.comboBox1.Margin = new System.Windows.Forms.Padding(4);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(212, 24);
-            this.comboBox1.TabIndex = 38;
+            this.comboBoxJtg.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxJtg.FormattingEnabled = true;
+            this.comboBoxJtg.Location = new System.Drawing.Point(620, 367);
+            this.comboBoxJtg.Margin = new System.Windows.Forms.Padding(4);
+            this.comboBoxJtg.Name = "comboBoxJtg";
+            this.comboBoxJtg.Size = new System.Drawing.Size(212, 24);
+            this.comboBoxJtg.TabIndex = 38;
             // 
             // button1
             // 
@@ -370,7 +370,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1048, 547);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.comboBoxJtg);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.JtxButtonGraph);
             this.Controls.Add(this.label6);
@@ -408,10 +408,11 @@
             this.PerformLayout();
         }
 
+        private System.Windows.Forms.ComboBox comboBoxJtg;
+
         private System.Windows.Forms.Button JtxButtonGraph;
 
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Label label6;
 
         #endregion

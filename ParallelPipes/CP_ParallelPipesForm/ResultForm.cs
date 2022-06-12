@@ -60,29 +60,29 @@ namespace CP_ParallelPipesForm
             UprButtonGraph.Click += (object sender, EventArgs e) =>
             {
                 graphicBtn_Click("Защитный потенциал,Upr, В", "Upr", 
-                    cp.name, comboBoxUpr, cp.getUtpr, cp.getUtprInterval);
+                    cp.name, comboBoxUpr, cp.getUtpr, cp.getUtprInterval, cp.useIntervals);
             };
             UtgButtonGraph.Click += (object sender, EventArgs e) =>
             {
-                graphicBtn_Click("Потенциал в грунте, Utg, В", "Utg", cp.name, comboBoxUtg, cp.getUtg);
+                graphicBtn_Click("Потенциал в грунте, Utg, В", "Utg", cp.name, comboBoxUtg, cp.getUtg, null, cp.useIntervals);
             };
             UtmButtonGraph.Click += (object sender, EventArgs e) =>
             {
-                graphicBtn_Click("Потенциал в металле, Utm, В", "Utm", cp.name, comboBoxUtm, cp.getUtm);
+                graphicBtn_Click("Потенциал в металле, Utm, В", "Utm", cp.name, comboBoxUtm, cp.getUtm, null, cp.useIntervals);
             };
             ItgButtonGraph.Click += (object sender, EventArgs e) =>
             {
                 graphicBtn_Click("Ток, втекающий через боковую поверхность, Itg, А/м2", cp.name, "Itg", comboBoxItg,
-                    cp.getItg, cp.getItgInterval);
+                    cp.getItg, cp.getItgInterval, cp.useIntervals);
             };
             ItxButtonGraph.Click += (object sender, EventArgs e) =>
             {
                 graphicBtn_Click("Продольный ток между соседними ФИ, Itx, А/м2", cp.name, "Itx", comboBoxItx,
-                    cp.getItx);
+                    cp.getItx, null, cp.useIntervals);
             };
             JtxButtonGraph.Click += (object sender, EventArgs e) =>
             {
-                graphicBtn_Click("Плотность тока \"грунт-труба\", Jtx, А/м2", cp.name, "Jtx", comboBoxItx, cp.getJt, cp.getJtInterval);
+                graphicBtn_Click("Плотность тока \"грунт-труба\", Jtx, А/м2", cp.name, "Jtx", comboBoxJtg, cp.getJt, cp.getJtInterval, cp.useIntervals);
             };
             SaveUtgButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getUtg, "Ut{0}g "); };
             SaveUtmButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getUtm, "Ut{0}m "); };
@@ -93,14 +93,16 @@ namespace CP_ParallelPipesForm
 
         void InitComboBoxes()
         {
-            string[] boxesNames = {"comboBoxUpr", "comboBoxUtg", "comboBoxUtm", "comboBoxItg", "comboBoxItx"};
-            for (int i = 0; i < cp.Pipes.Count; i++)
+            ComboBox[] boxesNames =
             {
-                for (int j = 0; j < boxesNames.Length; j++)
+                comboBoxUpr, comboBoxUtg, comboBoxUtm, comboBoxItg, comboBoxItx, comboBoxJtg
+            };
+            for (int j = 0; j < boxesNames.Length; j++)
+            {
+                ComboBox box = boxesNames[j];
+                box.Items.Add("Все");
+                for (int i = 0; i < cp.Pipes.Count; i++)
                 {
-                    ComboBox box = (ComboBox) this.GetType()
-                        .GetField(boxesNames[j], BindingFlags.Instance | BindingFlags.NonPublic).GetValue(this);
-                    box.Items.Add("Все");
                     box.Items.Add(cp.Pipes[i].name);
                     box.SelectedIndex = 0;
                 }
@@ -129,9 +131,15 @@ namespace CP_ParallelPipesForm
             }
             else
             {
-                double[][] pointss = points(comboBox.SelectedIndex - 1);
-                gf.ShowChart(cp.Pipes[comboBox.SelectedIndex - 1].name, pointss[0],
-                    pointss[1], comboBox.SelectedIndex - 1);
+                var pipeIndex = comboBox.SelectedIndex - 1;
+                if (useIntervals && pointsInterval != null)
+                {
+                    gf.ShowChart(cp.Pipes[pipeIndex].name, pointsInterval(pipeIndex).x, pointsInterval(pipeIndex).y, pipeIndex);
+                }
+                else
+                {
+                    gf.ShowChart(cp.Pipes[pipeIndex].name, points(pipeIndex)[0], points(pipeIndex)[1], pipeIndex);
+                }
             }
 
             gf.Show();
@@ -228,6 +236,7 @@ namespace CP_ParallelPipesForm
                 "Толщина стенки, м",
                 "Сопротивление изоляции, Ом*м2",
                 "-----Результаты вычислений-----",
+                "Сила тока в точке дренажа",
                 "Площадь сеч металла",
                 "Продольное сопротивление трубы, Ом/м",
                 "Сопротивление изоляции трубы, Ом*м",
@@ -259,6 +268,7 @@ namespace CP_ParallelPipesForm
                     cp.Pipes[i].Det.ToString(),
                     cp.Pipes[i].Ct.ToString(),
                     "",
+                    cp.getIts(i).ToString("E3"),
                     cp.Pipes[i].SechT.ToString("E3"),
                     cp.Pipes[i].RproT.ToString("E3"),
                     cp.Pipes[i].Rct.ToString("E3"),

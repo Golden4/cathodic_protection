@@ -9,12 +9,12 @@ namespace CP_ParallelPipesForm
 {
     public partial class MainForm : Form
     {
-        public string version = "0.6";
+        public string version = "0.9";
         public MainForm()
         {
             InitializeComponent();
             VersionLabel.Text = "Версия программы: " + version;
-
+            useIntervals.Checked = cp.useIntervals;
             I0Text.Text = cp.anod.I0.ToString();
             ZaText.Text = cp.anod.Za.ToString();
             LText.Text = cp.L.ToString();
@@ -30,6 +30,7 @@ namespace CP_ParallelPipesForm
             try
             {
                 cp.name = NameVar.Text;
+                cp.useIntervals = useIntervals.Checked;
                 cp.anod.I0 = double.Parse(I0Text.Text);
                 cp.anod.Za = double.Parse(ZaText.Text);
                 cp.L = int.Parse(LText.Text);

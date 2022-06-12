@@ -22,6 +22,7 @@ namespace CP_ParallelPipesForm
             InitializeComponent();
             chart1.Series.Clear();
             chart1.ChartAreas.Clear();
+            chart1.Legends.Clear();
             chart1.ChartAreas.Add(new ChartArea());
             chart1.ChartAreas[0].AxisX.IsStartedFromZero = false;
             chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;
@@ -34,7 +35,10 @@ namespace CP_ParallelPipesForm
             chart1.ChartAreas[0].Position.Height = 100;
             chart1.ChartAreas[0].Position.Y = 8;
             chart1.Titles.Add(graphName);
-            chart1.Legends.Add(new Legend());
+            var legends = new Legend();
+            legends.Position = new ElementPosition();
+            legends.Position.Auto = true;
+            chart1.Legends.Add(legends);
         }
 
         public void ShowChart(string chartName, double[] x, double[] y, int colorIndex = -1, bool useSpline = true)
@@ -44,7 +48,7 @@ namespace CP_ParallelPipesForm
                 Series newSeries = new Series(chartName);
                 newSeries.Points.Clear();
                 newSeries.ChartType = useSpline ? SeriesChartType.Spline : SeriesChartType.Line;
-                newSeries.MarkerStyle = MarkerStyle.Circle;
+                newSeries.MarkerStyle = MarkerStyle.None;
                 newSeries.LabelBorderWidth = 3;
                 newSeries.BorderWidth = 3;
                 if (colorIndex > -1)
@@ -58,6 +62,17 @@ namespace CP_ParallelPipesForm
                 {
                     chart1.Series[chart1.Series.Count - 1].Points.AddXY(x[i], y[i]);
                 }
+
+                // var textAnnotation = new TextAnnotation();
+                // textAnnotation.Text = "456";
+                // // textAnnotation.X = ;
+                // // textAnnotation.Y = y[y.Length - 3];
+                // textAnnotation.Visible = true;
+                // var lineAnnotaion = new LineAnnotation();
+                // lineAnnotaion.AnchorDataPoint = chart1.Series[chart1.Series.Count - 1].Points[3];
+                // lineAnnotaion.Width = 10;
+                // lineAnnotaion.Height = 10;
+                // chart1.Annotations.Add(lineAnnotaion);
             }
             catch (Exception ex)
             {
