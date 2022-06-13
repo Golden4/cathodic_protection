@@ -666,6 +666,16 @@ namespace CP_ParallelPipesForm
 
             return new double[2][] {Itg[0], Jtg};
         }
+        
+        public double[][] getCt(int k)
+        {
+            double[] CtMid = new double[Nfi];
+            for (int i = 0; i < Nfi; i++)
+            {
+                CtMid[i] = Pipes[k].iCt[i].Mid();
+            }
+            return new double[2][] {getX(Nfi), CtMid};
+        }
 
         public (double[], Interval[]) getItgInterval(int k)
         {
@@ -708,6 +718,11 @@ namespace CP_ParallelPipesForm
             }
 
             return (getX(size), Jtg);
+        }
+        
+        public (double[], Interval[]) getCtInterval(int k)
+        {
+            return (getX(Nfi), Pipes[k].iCt);
         }
     }
 

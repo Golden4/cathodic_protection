@@ -84,6 +84,11 @@ namespace CP_ParallelPipesForm
             {
                 graphicBtn_Click("Плотность тока \"грунт-труба\", Jtx, А/м2", cp.name, "Jtx", comboBoxJtg, cp.getJt, cp.getJtInterval, cp.useIntervals);
             };
+            CtGraphButton.Click += (object sender, EventArgs e) =>
+            {
+                graphicBtn_Click("Сопротивление изоляции", cp.name, "Ct", comboBoxCt, cp.getCt,
+                    cp.getCtInterval, cp.useIntervals, false);
+            };
             SaveUtgButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getUtg, "Ut{0}g "); };
             SaveUtmButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getUtm, "Ut{0}m "); };
             SaveItgButton.Click += (object sender, EventArgs e) => { saveResultsToFile(cp.getItg, "It{0}g "); };
@@ -95,7 +100,7 @@ namespace CP_ParallelPipesForm
         {
             ComboBox[] boxesNames =
             {
-                comboBoxUpr, comboBoxUtg, comboBoxUtm, comboBoxItg, comboBoxItx, comboBoxJtg
+                comboBoxUpr, comboBoxUtg, comboBoxUtm, comboBoxItg, comboBoxItx, comboBoxJtg, comboBoxCt
             };
             for (int j = 0; j < boxesNames.Length; j++)
             {
@@ -110,7 +115,7 @@ namespace CP_ParallelPipesForm
         }
 
         private void graphicBtn_Click(string graphName, string name, string issledName, ComboBox comboBox,
-            Func<int, double[][]> points, Func<int, (double[] x, Interval[] y)> pointsInterval = null, bool useIntervals = true)
+            Func<int, double[][]> points, Func<int, (double[] x, Interval[] y)> pointsInterval = null, bool useIntervals = true, bool useSpline = true)
         {
             GraphicForm gf = new GraphicForm(graphName, name, issledName);
             gf.Text = "График: " + graphName;
@@ -121,11 +126,11 @@ namespace CP_ParallelPipesForm
                 {
                     if (useIntervals && pointsInterval != null)
                     {
-                        gf.ShowChart(cp.Pipes[i].name, pointsInterval(i).x, pointsInterval(i).y, i);
+                        gf.ShowChart(cp.Pipes[i].name, pointsInterval(i).x, pointsInterval(i).y, i, useSpline);
                     }
                     else
                     {
-                        gf.ShowChart(cp.Pipes[i].name, points(i)[0], points(i)[1], i);
+                        gf.ShowChart(cp.Pipes[i].name, points(i)[0], points(i)[1], i, useSpline);
                     }
                 }
             }
@@ -134,11 +139,11 @@ namespace CP_ParallelPipesForm
                 var pipeIndex = comboBox.SelectedIndex - 1;
                 if (useIntervals && pointsInterval != null)
                 {
-                    gf.ShowChart(cp.Pipes[pipeIndex].name, pointsInterval(pipeIndex).x, pointsInterval(pipeIndex).y, pipeIndex);
+                    gf.ShowChart(cp.Pipes[pipeIndex].name, pointsInterval(pipeIndex).x, pointsInterval(pipeIndex).y, pipeIndex, useSpline);
                 }
                 else
                 {
-                    gf.ShowChart(cp.Pipes[pipeIndex].name, points(pipeIndex)[0], points(pipeIndex)[1], pipeIndex);
+                    gf.ShowChart(cp.Pipes[pipeIndex].name, points(pipeIndex)[0], points(pipeIndex)[1], pipeIndex, useSpline);
                 }
             }
 

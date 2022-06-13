@@ -58,6 +58,10 @@
             this.button1 = new System.Windows.Forms.Button();
             this.JtxButtonGraph = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
+            this.comboBoxCt = new System.Windows.Forms.ComboBox();
+            this.button2 = new System.Windows.Forms.Button();
+            this.CtGraphButton = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // UprButtonGraph
@@ -214,7 +218,7 @@
             // 
             this.CalcTimeText.AutoSize = true;
             this.CalcTimeText.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte) (204)));
-            this.CalcTimeText.Location = new System.Drawing.Point(12, 521);
+            this.CalcTimeText.Location = new System.Drawing.Point(12, 600);
             this.CalcTimeText.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.CalcTimeText.Name = "CalcTimeText";
             this.CalcTimeText.Size = new System.Drawing.Size(186, 17);
@@ -223,7 +227,7 @@
             // 
             // OrigParamsButton
             // 
-            this.OrigParamsButton.Location = new System.Drawing.Point(421, 426);
+            this.OrigParamsButton.Location = new System.Drawing.Point(421, 498);
             this.OrigParamsButton.Margin = new System.Windows.Forms.Padding(4);
             this.OrigParamsButton.Name = "OrigParamsButton";
             this.OrigParamsButton.Size = new System.Drawing.Size(191, 41);
@@ -235,7 +239,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(16, 439);
+            this.label8.Location = new System.Drawing.Point(16, 511);
             this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(215, 17);
@@ -244,7 +248,7 @@
             // 
             // SaveAllResultButton
             // 
-            this.SaveAllResultButton.Location = new System.Drawing.Point(421, 485);
+            this.SaveAllResultButton.Location = new System.Drawing.Point(421, 564);
             this.SaveAllResultButton.Margin = new System.Windows.Forms.Padding(4);
             this.SaveAllResultButton.Name = "SaveAllResultButton";
             this.SaveAllResultButton.Size = new System.Drawing.Size(403, 41);
@@ -257,7 +261,7 @@
             // 
             this.dateTimeLabel.AutoSize = true;
             this.dateTimeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte) (204)));
-            this.dateTimeLabel.Location = new System.Drawing.Point(12, 498);
+            this.dateTimeLabel.Location = new System.Drawing.Point(12, 577);
             this.dateTimeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.dateTimeLabel.Name = "dateTimeLabel";
             this.dateTimeLabel.Size = new System.Drawing.Size(94, 17);
@@ -316,7 +320,7 @@
             // 
             // SaveOrigButton
             // 
-            this.SaveOrigButton.Location = new System.Drawing.Point(841, 426);
+            this.SaveOrigButton.Location = new System.Drawing.Point(841, 498);
             this.SaveOrigButton.Margin = new System.Windows.Forms.Padding(4);
             this.SaveOrigButton.Name = "SaveOrigButton";
             this.SaveOrigButton.Size = new System.Drawing.Size(191, 41);
@@ -365,11 +369,55 @@
             this.label6.TabIndex = 35;
             this.label6.Text = "Плотность тока, Jtg";
             // 
+            // comboBoxCt
+            // 
+            this.comboBoxCt.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxCt.FormattingEnabled = true;
+            this.comboBoxCt.Location = new System.Drawing.Point(620, 434);
+            this.comboBoxCt.Margin = new System.Windows.Forms.Padding(4);
+            this.comboBoxCt.Name = "comboBoxCt";
+            this.comboBoxCt.Size = new System.Drawing.Size(212, 24);
+            this.comboBoxCt.TabIndex = 42;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(841, 425);
+            this.button2.Margin = new System.Windows.Forms.Padding(4);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(191, 41);
+            this.button2.TabIndex = 41;
+            this.button2.Text = "Сохранить в файл";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
+            // CtGraphButton
+            // 
+            this.CtGraphButton.Location = new System.Drawing.Point(421, 425);
+            this.CtGraphButton.Margin = new System.Windows.Forms.Padding(4);
+            this.CtGraphButton.Name = "CtGraphButton";
+            this.CtGraphButton.Size = new System.Drawing.Size(191, 41);
+            this.CtGraphButton.TabIndex = 40;
+            this.CtGraphButton.Text = "График";
+            this.CtGraphButton.UseVisualStyleBackColor = true;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(16, 437);
+            this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(199, 17);
+            this.label7.TabIndex = 39;
+            this.label7.Text = "Сопротивление изоляции, Ct";
+            // 
             // ResultForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1048, 547);
+            this.ClientSize = new System.Drawing.Size(1048, 631);
+            this.Controls.Add(this.comboBoxCt);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.CtGraphButton);
+            this.Controls.Add(this.label7);
             this.Controls.Add(this.comboBoxJtg);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.JtxButtonGraph);
@@ -407,6 +455,12 @@
             this.ResumeLayout(false);
             this.PerformLayout();
         }
+
+        private System.Windows.Forms.ComboBox comboBoxCt;
+        private System.Windows.Forms.Button CtGraphButton;
+
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label label7;
 
         private System.Windows.Forms.ComboBox comboBoxJtg;
 
